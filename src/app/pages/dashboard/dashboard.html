@@ -1,0 +1,136 @@
+<section class="dash">
+
+    <header class="dash-header">
+
+        <div>
+            <span class="dash-eyebrow">PAINEL DE CONTROLE</span>
+            <h1>Seu estoque em um só lugar.</h1>
+            <p>
+                Acompanhe seus produtos e mantenha o catálogo organizado.
+            </p>
+        </div>
+
+        <a routerLink="/produtos" class="dash-primary">
+            Ver produtos <span aria-hidden="true">→</span>
+        </a>
+    </header>
+
+    @if (erro()) {
+    <div class="dash-error" role="alert">
+        Não foi possível carregar os dados do painel.
+        Tente novamente em instantes.
+    </div>
+    }
+
+    <div class="dash-stats">
+
+        <article class="dash-stat">
+            <div class="dash-stat-top">
+                <span>Produtos ativos</span>
+                <span class="dash-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 7.5 12 3l9 4.5-9 4.5L3 7.5Z"></path>
+                        <path d="M3 7.5V16.5L12 21l9-4.5V7.5"></path>
+                        <path d="M12 12v9"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <strong class="dash-stat-value">
+                {{ carregando() ? '...' : erro() ? '-' : totalProdutos()}}
+            </strong>
+
+            <p>Total de produtos cadastrados</p>
+        </article>
+
+        <article class="dash-stat">
+            <div class="dash-stat-top">
+                <span>Unidades em estoque</span>
+                <span class="dash-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 7h16"></path>
+                        <path d="M6 12h12"></path>
+                        <path d="M8 17h8"></path>
+                    </svg>
+                </span>
+            </div>
+
+            <strong class="dash-stat-value">
+                {{ carregando() ? '...' : erro() ? '-' : totalUnidades()}}
+            </strong>
+
+            <p>Quantidade disponível no catálogo</p>
+        </article>
+
+        <article class="dash-stat">
+            <div class="dash-stat-top">
+                <span>Valor do estoque</span>
+                <span class="dash-stat-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 3v18"></path>
+                        <path
+                            d="M16.5 7.5c0-1.9-1.8-3-4.5-3s-4.5 1.1-4.5 3 1.8 3 4.5 3 4.5 1.1 4.5 3-1.8 3-4.5 3-4.5-1.1-4.5-3">
+                        </path>
+                    </svg>
+                </span>
+            </div>
+
+            <strong class="dash-value dash-stat-money">
+                {{ carregando() ? '...' : erro() ? '-' : valorFormatado() }}
+            </strong>
+
+            <p>Valor estimado dos produtos cadastrados</p>
+        </article>
+    </div>
+
+    <div class="dash-section-heading">
+        <div>
+            <h2>Acesso rápido</h2>
+            <p>Escolha o que deseja fazer no sistema.</p>
+        </div>
+    </div>
+
+        <div class="dash-actions">
+
+            <a routerLink="/produtos" class="dash-action">
+
+                <span class="dash-action-symbol" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="10.5" cy="10.5" r="6.5"></circle>
+                        <path d="m16 16 5 5"></path>
+                    </svg>
+                </span>
+
+                <div class="dash-action-content">
+                    <span class="dash-action-label">CATÁLOGO</span>
+                    <h3>Consultar produtos</h3>
+                    <p>Visualize, pesquise e gerencie seus produtos.</p>
+                </div>
+
+                <span class="dash-action-arrow" aria-hidden="true">→</span>
+
+            </a>
+
+            <a routerLink="/produtos/novo" class="dash-action">
+
+                <span class="dash-action-symbol" aria-hidden="true">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="18" height="18" rx="4"></rect>
+                        <path d="M12 7v10"></path>
+                        <path d="M7 12h10"></path>
+                    </svg>
+                </span>
+
+                <div class="dash-action-content">
+                    <span class="dash-action-label">NOVO CADASTRO</span>
+                    <h3>Cadastrar produto</h3>
+                    <p>Adicione novos itens ao seu estoque.</p>
+                </div>
+
+                <span class="dash-action-arrow" aria-hidden="true">→</span>
+
+            </a>
+
+        </div>
+
+</section>

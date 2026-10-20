@@ -1,0 +1,279 @@
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.dash {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 0 56px;
+  color: #f5f7fb;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  margin-bottom: 38px;
+}
+
+.dash-eyebrow {
+  display: block;
+  color: #60a5fa;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+
+.dash-header h1 {
+  font-size: clamp(30px, 3vw, 44px);
+  font-weight: 750;
+  letter-spacing: -1.2px;
+  margin: 0 0 12px;
+}
+
+.dash-header p,
+.dash-section-heading p {
+  color: #a0adbf;
+  font-size: 15px;
+  margin: 0;
+}
+
+.dash-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 14px 22px;
+  background: #2563eb;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s;
+}
+
+.dash-primary:hover {
+  background: #1d4ed8;
+  color: #fff;
+}
+
+.dash-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.dash-stat {
+  min-width: 0;
+  min-height: 205px;
+  padding: 28px;
+  background: #15191f;
+  border: 1px solid #323b49;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dash-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #c0cad8;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dash-stat-icon {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.18);
+  color: #93c5fd;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dash-stat-icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dash-stat-value {
+  display: block;
+  color: #f8fafc;
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.15;
+  font-weight: 750;
+  letter-spacing: -1px;
+  overflow-wrap: anywhere;
+}
+
+.dash-stat-money {
+  font-size: clamp(25px, 2.5vw, 36px);
+}
+
+.dash-stat p {
+  margin: 0;
+  font-size: 13px;
+  color: #8e9bad;
+}
+
+.dash-section-heading {
+  margin: 42px 0 20px;
+}
+
+.dash-section-heading h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+
+.dash-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.dash-action {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 26px;
+  border: 1px solid #323b49;
+  border-radius: 18px;
+  background: #15191f;
+  color: #f5f7fb;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.dash-action:hover {
+  border-color: #60a5fa;
+  transform: translateY(-2px);
+  color: #fff;
+}
+
+.dash-action-symbol {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  background: #1e3153;
+  border-radius: 14px;
+  color: #93c5fd;
+  font-size: 27px;
+  font-weight: 500;
+}
+
+.dash-action h3 {
+  font-size: 18px;
+  font-weight: 650;
+  margin: 0 0 8px;
+}
+
+.dash-action p {
+  color: #a0adbf;
+  font-size: 13px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.dash-action-arrow {
+  margin-left: auto;
+  color: #93c5fd;
+  font-size: 23px;
+}
+
+.dash-error {
+  padding: 14px 18px;
+  margin-bottom: 22px;
+  background: #3c2328;
+  color: #fecaca;
+  border: 1px solid #85444c;
+  border-radius: 12px;
+}
+
+@media (max-width: 1050px) {
+  .dash-stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .dash-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dash-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .dash {
+    padding-top: 16px;
+  }
+
+  .dash-action {
+    padding: 20px;
+  }
+
+}
+
+.dash-action-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.dash-action-label {
+  display: block;
+  margin-bottom: 7px;
+  color: #60a5fa;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.dash-action-symbol svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.dash-action {
+  min-height: 148px;
+}
+
+.dash-action-arrow {
+  transition: transform 0.2s ease;
+}
+
+.dash-action:hover .dash-action-arrow {
+  transform: translateX(5px);
+}
+
+.dash-action:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 3px;
+}
