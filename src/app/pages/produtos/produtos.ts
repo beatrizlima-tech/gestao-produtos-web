@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-produtos',
@@ -9,6 +10,7 @@ import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } 
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
+    RouterLink
   ],
   templateUrl: './produtos.html',
   styleUrl: './produtos.css'
@@ -22,6 +24,8 @@ export class Produtos {
   produtos = signal<any[]>([]);
 
   busca = signal('');
+
+  notificacao = signal('');
 
   produtosFiltrados = computed(() => {
     const termo = this.busca().trim().toLowerCase();
@@ -38,12 +42,6 @@ export class Produtos {
       })
   }
 
-  formCadastro = new FormGroup({
-    nome : new FormControl('', [Validators.required]),
-    preco : new FormControl('', [Validators.required]),
-    quantidade : new FormControl('', [Validators.required])
-  });
-
   formEdicao = new FormGroup({
     id : new FormControl('', [Validators.required]),
     nome : new FormControl('', [Validators.required]),
@@ -51,15 +49,6 @@ export class Produtos {
     quantidade : new FormControl('', [Validators.required]),
     total : new FormControl('', [Validators.required]),
   });
-
-  cadastrar() {
-    this.http.post(this.apiUrl, this.formCadastro.value)
-      .subscribe((data: any) => {
-        alert(`Produto "${data.nome}", cadastrado com sucesso!`);
-        this.formCadastro.reset();
-        this.ngOnInit();
-      })
-  }
 
   obterDados(id: number) {
     this.http.get(this.apiUrl + "/" + id)
@@ -69,7 +58,10 @@ export class Produtos {
           nome: data.nome,
           preco: data.preco,
           quantidade: data.quantidade,
-          total: data.total
+          total: Number(data.total).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          })
         });
       })
   }
@@ -77,7 +69,7 @@ export class Produtos {
   atualizar() {
     this.http.put(this.apiUrl + "/" + this.formEdicao.value.id, this.formEdicao.value)
       .subscribe((data: any) => {
-        alert(`Produto "${data.nome}", atualizado com sucesso!`);
+        this.notificacao.set(`Produto "${data.nome}" atualizado com sucesso!`);
         this.formEdicao.reset();
         this.ngOnInit();
       })
@@ -87,10 +79,11 @@ export class Produtos {
     if(confirm('Deseja realmente excluir este produto?')) {
       this.http.delete(this.apiUrl + "/" + id)
         .subscribe((data: any) => {
-          alert(`Produto "${data.nome}", excluído com sucesso!`);
+          this.notificacao.set(`Produto "${data.nome}" excluído com sucesso!`);
           this.ngOnInit();
         });
     }
   }
+
 
 }

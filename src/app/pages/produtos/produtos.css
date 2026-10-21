@@ -1,4 +1,3 @@
-
 :host {
   display: block;
   width: 100%;
@@ -190,13 +189,109 @@
 }
 
 .produtos-table {
-  min-width: 760px;
+  width: 100%;
 }
 
 .produtos-table th,
 .produtos-table td {
-  padding: 16px 14px;
+  padding: 12px 8px;
   vertical-align: middle;
   white-space: nowrap;
+  font-size: 14px;
 }
 
+.produtos-notificacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  background: #15382e;
+  border: 1px solid #28785e;
+  border-radius: 12px;
+  color: #bbf7d0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.produtos-notificacao button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+
+/* Modal de edição */
+
+#modalEdicao .modal-content {
+  background: #15191f !important;
+  border: 1px solid #323b49 !important;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+#modalEdicao .modal-header {
+  padding: 24px 28px;
+  border-bottom: 1px solid #323b49 !important;
+}
+
+#modalEdicao .modal-title {
+  color: #f5f7fb;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+#modalEdicao .modal-body {
+  padding: 28px;
+}
+
+#modalEdicao .form-label {
+  color: #cbd5e1 !important;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+#modalEdicao .form-control {
+  min-height: 48px;
+  background: #202936 !important;
+  color: #f5f7fb !important;
+  border: 1px solid #384355 !important;
+  border-radius: 12px !important;
+  padding: 10px 14px;
+}
+
+#modalEdicao .form-control:focus {
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.12);
+}
+
+#modalEdicao .form-control[readonly] {
+  color: #94a3b8 !important;
+  cursor: default;
+}
+
+#modalEdicao .btn-warning {
+  background: #fbbf24;
+  border-color: #fbbf24;
+  color: #171717;
+  font-weight: 600;
+  padding: 12px 22px;
+  border-radius: 10px;
+}
+
+#modalEdicao .btn-warning:hover {
+  background: #f59e0b;
+  border-color: #f59e0b;
+}
+
+@media (max-width: 576px) {
+  #modalEdicao .modal-header,
+  #modalEdicao .modal-body {
+    padding: 20px;
+  }
+}
