@@ -131,7 +131,17 @@
 
                 <tr>
                   <td>{{ item.id }}</td>
-                  <td>{{ item.nome | uppercase }}</td>
+                  <td>
+                    <div class="fw-semibold">
+                      {{ item.nome | uppercase }}
+                    </div>
+
+                    @if (item.descricao) {
+                    <div class="small text-secondary mt-1 text-break">
+                      {{ item.descricao }}
+                    </div>
+                    }
+                  </td>
                   <td>{{ item.preco | currency : 'BRL':'symbol':'1.2-2' }}</td>
                   <td>{{ item.quantidade }}</td>
                   <td>{{ item.total | currency : 'BRL':'symbol':'1.2-2' }}</td>
@@ -191,6 +201,16 @@
                   class="form-control bg-dark text-light border-secondary rounded-3">
               </div>
             </div>
+
+            <div class="mb-3">
+              <label for="descricaoEdicao" class="form-label text-secondary small">
+                Descrição do produto
+              </label>
+
+              <textarea id="descricaoEdicao" formControlName="descricao"
+                class="form-control bg-dark text-light border-secondary rounded-3" maxlength="500" rows="2">
+              </textarea>
+            </div>
             <div class="row g-3">
               <div class="col-4">
                 <label class="form-label text-secondary small">Preço (R$)</label>
@@ -210,8 +230,7 @@
             </div>
 
             <div class="mt-4">
-              <button type="submit" class="btn btn-warning rounded-3" data-bs-dismiss="modal"
-                [disabled]="formEdicao.invalid">
+              <button type="submit" class="btn btn-warning rounded-3" [disabled]="formEdicao.invalid">
                 Salvar alterações
               </button>
             </div>

@@ -138,3 +138,11 @@ header p {
     }
 
 }
+
+.descricao-auto {
+    field-sizing: content;
+    min-height: 48px;
+    max-height: 160px;
+    overflow-y: auto;
+    resize: vertical;
+}

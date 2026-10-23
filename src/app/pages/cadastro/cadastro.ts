@@ -30,6 +30,13 @@ export class Cadastro {
       ]
     }),
 
+    descricao: new FormControl('', {
+      nonNullable: true,
+      validators: [
+        Validators.maxLength(500)
+      ]
+    }),
+
     preco: new FormControl<number | null>(null, [
       Validators.required,
       Validators.min(0.01)

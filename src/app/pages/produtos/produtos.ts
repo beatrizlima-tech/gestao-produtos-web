@@ -16,9 +16,9 @@ import { RouterLink } from '@angular/router';
   styleUrl: './produtos.css'
 })
 export class Produtos {
-  
+
   private apiUrl = "http://localhost:8081/api/v1/produtos";
-  
+
   private http = inject(HttpClient);
 
   produtos = signal<any[]>([]);
@@ -43,11 +43,12 @@ export class Produtos {
   }
 
   formEdicao = new FormGroup({
-    id : new FormControl('', [Validators.required]),
-    nome : new FormControl('', [Validators.required]),
-    preco : new FormControl('', [Validators.required]),
-    quantidade : new FormControl('', [Validators.required]),
-    total : new FormControl('', [Validators.required]),
+    id: new FormControl('', [Validators.required]),
+    nome: new FormControl('', [Validators.required]),
+    descricao: new FormControl('', [Validators.maxLength(500)]),
+    preco: new FormControl('', [Validators.required]),
+    quantidade: new FormControl('', [Validators.required]),
+    total: new FormControl('', [Validators.required]),
   });
 
   obterDados(id: number) {
@@ -56,6 +57,7 @@ export class Produtos {
         this.formEdicao.patchValue({
           id: data.id,
           nome: data.nome,
+          descricao: data.descricao ?? '',
           preco: data.preco,
           quantidade: data.quantidade,
           total: Number(data.total).toLocaleString('pt-BR', {
@@ -67,16 +69,29 @@ export class Produtos {
   }
 
   atualizar() {
-    this.http.put(this.apiUrl + "/" + this.formEdicao.value.id, this.formEdicao.value)
+    const produtoAtualizado = {
+      nome: this.formEdicao.value.nome,
+      descricao: this.formEdicao.value.descricao,
+      preco: this.formEdicao.value.preco,
+      quantidade: this.formEdicao.value.quantidade
+    };
+
+    this.http.put(
+      this.apiUrl + "/" + this.formEdicao.value.id,
+      produtoAtualizado
+    )
       .subscribe((data: any) => {
-        this.notificacao.set(`Produto "${data.nome}" atualizado com sucesso!`);
+        this.notificacao.set(
+          `Produto "${data.nome}" atualizado com sucesso!`
+        );
         this.formEdicao.reset();
         this.ngOnInit();
-      })
+      });
   }
 
+
   excluir(id: number) {
-    if(confirm('Deseja realmente excluir este produto?')) {
+    if (confirm('Deseja realmente excluir este produto?')) {
       this.http.delete(this.apiUrl + "/" + id)
         .subscribe((data: any) => {
           this.notificacao.set(`Produto "${data.nome}" excluído com sucesso!`);
