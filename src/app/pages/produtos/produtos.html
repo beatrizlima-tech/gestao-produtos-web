@@ -1,20 +1,17 @@
 <div class="container-fluid bg-dark text-light min-vh-100 py-4">
   <div class="container-fluid px-3 px-lg-4">
 
-    @if(notificacao()) {
+    @if (notificacao()) {
     <div class="produtos-notificacao" role="status">
       <span>{{ notificacao() }}</span>
 
       <button type="button" aria-label="Fechar notificação" (click)="notificacao.set('')">
         ×
       </button>
-
     </div>
     }
 
-
     <header class="produtos-header">
-
       <div class="produtos-header-content">
         <span class="produtos-eyebrow">
           GERENCIAMENTO DE ESTOQUE
@@ -35,25 +32,27 @@
           <path d="M12 12v9"></path>
         </svg>
       </div>
-
     </header>
 
-
     <div class="card produtos-card text-light rounded-4">
+
       <div
         class="card-header bg-transparent border-secondary d-flex justify-content-between align-items-center flex-wrap gap-3 p-4">
         <div>
           <h5 class="fw-semibold mb-1">Consulta de produtos</h5>
-          <p class="text-secondary mb-0 small">Visualize, edite e exclua os produtos cadastrados.</p>
+          <p class="text-secondary mb-0 small">
+            Visualize, edite e exclua os produtos cadastrados.
+          </p>
         </div>
+
         <a routerLink="/produtos/novo" class="btn btn-primary rounded-3">
           + Cadastrar produto
         </a>
-
       </div>
-      <div class="card-body p-4">
-        <div class="produtos-toolbar">
 
+      <div class="card-body p-4">
+
+        <div class="produtos-toolbar">
           <div class="produtos-search">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="10.5" cy="10.5" r="6.5"></circle>
@@ -62,15 +61,14 @@
 
             <input #campoBusca type="search" placeholder="Pesquisar produto pelo nome..."
               aria-label="Pesquisar produto pelo nome" [value]="busca()" (input)="busca.set(campoBusca.value)" />
-
           </div>
-
         </div>
+
         <div class="table-responsive">
+
           @if (produtos().length === 0) {
 
           <div class="produtos-empty">
-
             <div class="produtos-empty-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 7.5 12 3l9 4.5-9 4.5L3 7.5Z"></path>
@@ -85,13 +83,11 @@
               Os produtos cadastrados aparecerão aqui.
               Comece adicionando seu primeiro produto.
             </p>
-
           </div>
 
           } @else if (produtosFiltrados().length === 0) {
 
           <div class="produtos-empty">
-
             <div class="produtos-empty-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="10.5" cy="10.5" r="6.5"></circle>
@@ -105,13 +101,11 @@
               Não encontramos produtos com esse nome.
               Tente pesquisar novamente.
             </p>
-
           </div>
 
           } @else {
 
           <div class="table-responsive">
-
             <table class="table table-dark table-hover align-middle mb-0 produtos-table">
 
               <thead>
@@ -126,11 +120,10 @@
               </thead>
 
               <tbody>
-
                 @for (item of produtosFiltrados(); track item.id) {
-
                 <tr>
                   <td>{{ item.id }}</td>
+
                   <td>
                     <div class="fw-semibold">
                       {{ item.nome | uppercase }}
@@ -142,61 +135,75 @@
                     </div>
                     }
                   </td>
-                  <td>{{ item.preco | currency : 'BRL':'symbol':'1.2-2' }}</td>
+
+                  <td>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</td>
                   <td>{{ item.quantidade }}</td>
-                  <td>{{ item.total | currency : 'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</td>
 
                   <td class="text-center">
-
-                    <button class="btn btn-outline-warning btn-sm rounded-3 me-1" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-outline-warning btn-sm rounded-3 me-1" data-bs-toggle="modal"
                       data-bs-target="#modalEdicao" (click)="obterDados(item.id)">
                       Editar
                     </button>
 
-                    <button class="btn btn-outline-danger btn-sm rounded-3" (click)="excluir(item.id)">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-3" data-bs-toggle="modal"
+                      data-bs-target="#modalExclusao"
+                      (click)="selecionarProdutoParaExcluir(item); confirmacaoExclusao.set(false); erroExclusao.set('')">
                       Excluir
                     </button>
-
                   </td>
                 </tr>
-
                 }
-
               </tbody>
 
             </table>
-
           </div>
 
           }
+
         </div>
       </div>
-
     </div>
   </div>
 
-  <div class="modal fade" id="modalEdicao" tabindex="-1">
+  <div class="modal fade" id="modalEdicao" tabindex="-1" aria-labelledby="tituloModalEdicao" aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-black text-light border-secondary">
+
         <div class="modal-header border-secondary">
           <div>
-            <h5 class="modal-title fw-semibold">Editar produto</h5>
-            <p class="text-secondary small mb-0">Altere os dados do produto selecionado.</p>
-          </div>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
+            <h5 class="modal-title fw-semibold" id="tituloModalEdicao">
+              Editar produto
+            </h5>
 
+            <p class="text-secondary small mb-0">
+              Altere os dados do produto selecionado.
+            </p>
+          </div>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar">
+          </button>
+        </div>
+
+        <div class="modal-body">
           <form [formGroup]="formEdicao" (ngSubmit)="atualizar()">
 
             <div class="row g-3 mb-3">
               <div class="col-3">
-                <label class="form-label text-secondary small">ID</label>
+                <label class="form-label text-secondary small">
+                  ID
+                </label>
+
                 <input type="text" formControlName="id"
                   class="form-control bg-dark text-light border-secondary rounded-3" readonly>
               </div>
+
               <div class="col-9">
-                <label class="form-label text-secondary small">Nome do produto</label>
+                <label class="form-label text-secondary small">
+                  Nome do produto
+                </label>
+
                 <input type="text" formControlName="nome"
                   class="form-control bg-dark text-light border-secondary rounded-3">
               </div>
@@ -208,22 +215,33 @@
               </label>
 
               <textarea id="descricaoEdicao" formControlName="descricao"
-                class="form-control bg-dark text-light border-secondary rounded-3" maxlength="500" rows="2">
-              </textarea>
+                class="form-control bg-dark text-light border-secondary rounded-3" maxlength="500" rows="2"></textarea>
             </div>
+
             <div class="row g-3">
               <div class="col-4">
-                <label class="form-label text-secondary small">Preço (R$)</label>
+                <label class="form-label text-secondary small">
+                  Preço (R$)
+                </label>
+
                 <input type="number" formControlName="preco"
                   class="form-control bg-dark text-light border-secondary rounded-3" step="0.01">
               </div>
+
               <div class="col-4">
-                <label class="form-label text-secondary small">Quantidade</label>
+                <label class="form-label text-secondary small">
+                  Quantidade
+                </label>
+
                 <input type="number" formControlName="quantidade"
                   class="form-control bg-dark text-light border-secondary rounded-3">
               </div>
+
               <div class="col-4">
-                <label class="form-label text-secondary small">Total</label>
+                <label class="form-label text-secondary small">
+                  Total
+                </label>
+
                 <input type="text" formControlName="total"
                   class="form-control bg-dark text-light border-secondary rounded-3" readonly>
               </div>
@@ -236,8 +254,123 @@
             </div>
 
           </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalExclusao" tabindex="-1" aria-labelledby="tituloModalExclusao" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light border-secondary rounded-4">
+
+        <div class="modal-header border-secondary p-4">
+          <div>
+            <h5 class="modal-title fw-semibold" id="tituloModalExclusao">
+
+              @if (confirmacaoExclusao()) {
+              Confirmar exclusão
+              } @else {
+              Mover produto para a lixeira?
+              }
+
+            </h5>
+
+            <p class="text-secondary small mb-0 mt-2">
+              @if (confirmacaoExclusao()) {
+              Esta ação precisa da sua confirmação.
+              } @else {
+              Confira o produto antes de continuar.
+              }
+            </p>
+          </div>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"
+            (click)="confirmacaoExclusao.set(false)">
+          </button>
+        </div>
+
+        <div class="modal-body p-4">
+
+          @if (produtoParaExcluir(); as produto) {
+          <div class="rounded-3 p-3 mb-4" style="background: #202936; border: 1px solid #384355;">
+
+            <div class="fw-semibold text-light">
+              {{ produto.nome }}
+            </div>
+
+            @if (produto.descricao) {
+            <p class="text-secondary small mt-2 mb-0">
+              {{ produto.descricao }}
+            </p>
+            }
+          </div>
+          }
+
+          @if (!confirmacaoExclusao()) {
+
+          <div class="rounded-3 p-3"
+            style="background: rgba(96, 165, 250, 0.08); border: 1px solid rgba(96, 165, 250, 0.2);">
+
+            <strong style="color: #93c5fd;">
+              Você poderá recuperar este produto.
+            </strong>
+
+            <p class="text-light small mt-2 mb-0">
+              O produto ficará disponível na lixeira por até
+              30 dias. Durante esse período, poderá ser
+              restaurado ou excluído definitivamente.
+            </p>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-light rounded-3 px-4" data-bs-dismiss="modal"
+              (click)="confirmacaoExclusao.set(false)">
+              Cancelar
+            </button>
+
+            <button type="button" class="btn btn-primary rounded-3 px-4" (click)="confirmacaoExclusao.set(true)">
+              Continuar
+            </button>
+          </div>
+
+          } @else {
+
+          <div class="mb-4">
+            <h6 class="fw-semibold text-light mb-2">
+              Tem certeza de que deseja mover este produto para a lixeira?
+            </h6>
+
+            <p class="text-secondary small mb-0">
+              O produto deixará de aparecer na lista de produtos ativos.
+              Você poderá recuperá-lo na lixeira por até 30 dias.
+            </p>
+          </div>
+
+          @if (erroExclusao()) {
+          <div class="alert alert-danger mb-3" role="alert">
+            {{ erroExclusao() }}
+          </div>
+          }
+
+          <div class="d-flex justify-content-end gap-2 flex-wrap mt-4">
+            <button type="button" class="btn btn-outline-light rounded-3 px-4" [disabled]="excluindo()"
+              (click)="confirmacaoExclusao.set(false)">
+              Não, voltar
+            </button>
+
+            <button type="button" class="btn btn-danger rounded-3 px-4" [disabled]="excluindo()"
+              (click)="confirmarExclusao()">
+              {{ excluindo() ? 'Movendo...' : 'Sim, confirmar' }}
+            </button>
+          </div>
+
+          }
 
         </div>
       </div>
     </div>
   </div>
+
+</div>

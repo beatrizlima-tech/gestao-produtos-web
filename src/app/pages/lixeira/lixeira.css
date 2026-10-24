@@ -1,0 +1,169 @@
+:host .text-secondary {
+  color: #cbd5e1 !important;
+}
+
+.lixeira-produto-card {
+  background: #202936;
+  border: 1px solid #384355;
+  border-radius: 14px;
+  padding: 24px;
+  transition: border-color 0.2s ease;
+}
+
+.lixeira-produto-card:hover {
+  border-color: #64748b;
+}
+
+.lixeira-produto-card h3 {
+  color: #f5f7fb;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.lixeira-status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  background: #34445e;
+  color: #cbd5e1;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lixeira-icone-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  background: #34445e;
+  color: #93c5fd;
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.lixeira-contador {
+  background: #34445e;
+  color: #dbeafe;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.lixeira-produto-card {
+  background: #202936;
+  border: 1px solid #425573;
+  border-radius: 16px;
+  padding: 28px 30px;
+}
+
+.lixeira-produto-card:hover {
+  border-color: #647b9a;
+}
+
+.lixeira-produto-card h3 {
+  color: #f8fafc;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.lixeira-status {
+  background: #34445e;
+  color: #dbeafe;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.lixeira-detalhes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+}
+
+.lixeira-detalhe {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.lixeira-detalhe svg,
+.lixeira-prazo svg {
+  color: #93c5fd;
+  flex-shrink: 0;
+}
+
+.lixeira-divisor {
+  border: 0;
+  border-top: 1px solid #485569;
+  opacity: 1;
+  margin: 20px 0;
+}
+
+.lixeira-prazo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #cbd5e1;
+  font-size: 14px;
+}
+
+.lixeira-btn-restaurar,
+.lixeira-btn-restaurar:disabled {
+  background: #2563eb;
+  border: 1px solid #2563eb;
+  color: #ffffff;
+  border-radius: 9px;
+  padding: 10px 15px;
+}
+
+.lixeira-btn-excluir,
+.lixeira-btn-excluir:disabled {
+  background: transparent;
+  border: 1px solid #d66b7c;
+  color: #fda4af;
+  border-radius: 9px;
+  padding: 10px 15px;
+}
+
+.lixeira-btn-restaurar:disabled,
+.lixeira-btn-excluir:disabled {
+  opacity: 0.85;
+}
+
+@media (max-width: 576px) {
+  .lixeira-produto-card {
+    padding: 20px;
+  }
+
+  .lixeira-detalhes {
+    gap: 12px 18px;
+  }
+}
+
+.lixeira-aviso {
+  margin-left: 76px;
+}
+
+.lixeira-aviso svg {
+  color: #93c5fd;
+}
+
+@media (max-width: 576px) {
+  .lixeira-aviso {
+    margin-left: 0;
+  }
+}
+
+
+.lixeira-info svg {
+  color: #93c5fd;
+  margin-top: 2px;
+}

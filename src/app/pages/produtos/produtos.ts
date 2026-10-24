@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import 'bootstrap/dist/js/bootstrap.esm.min.js';
 
 @Component({
   selector: 'app-produtos',
@@ -26,6 +27,12 @@ export class Produtos {
   busca = signal('');
 
   notificacao = signal('');
+
+  produtoParaExcluir = signal<any | null>(null);
+
+  excluindo = signal(false);
+  erroExclusao = signal('');
+  confirmacaoExclusao = signal(false);
 
   produtosFiltrados = computed(() => {
     const termo = this.busca().trim().toLowerCase();
@@ -87,6 +94,45 @@ export class Produtos {
         this.formEdicao.reset();
         this.ngOnInit();
       });
+  }
+
+  selecionarProdutoParaExcluir(produto: any) {
+    this.produtoParaExcluir.set(produto);
+  }
+
+
+  confirmarExclusao() {
+    const produto = this.produtoParaExcluir();
+
+    if (!produto || this.excluindo()) {
+      return;
+    }
+
+    this.excluindo.set(true);
+    this.erroExclusao.set('');
+
+    this.http.delete(`${this.apiUrl}/${produto.id}`).subscribe({
+      next: () => {
+        this.notificacao.set(
+          `Produto "${produto.nome}" movido para a lixeira com sucesso!`
+        );
+
+        document
+          .querySelector<HTMLButtonElement>('#modalExclusao .btn-close')
+          ?.click();
+
+        this.produtoParaExcluir.set(null);
+        this.excluindo.set(false);
+        this.ngOnInit();
+      },
+      error: () => {
+        this.erroExclusao.set(
+          'Não foi possível mover o produto para a lixeira. Tente novamente.'
+        );
+
+        this.excluindo.set(false);
+      }
+    });
   }
 
 

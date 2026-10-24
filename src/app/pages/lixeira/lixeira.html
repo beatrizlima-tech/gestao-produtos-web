@@ -1,0 +1,157 @@
+<section class="container-fluid bg-dark text-light min-vh-100 py-4">
+    <div class="container-fluid px-3 px-lg-4">
+
+        <header class="mb-4">
+            <span class="text-primary fw-semibold small">
+                GERENCIAMENTO DE ESTOQUE
+            </span>
+
+            <h1 class="fw-bold mt-2">
+                Lixeira de produtos
+            </h1>
+
+            <p class="text-secondary">
+                Consulte os produtos excluídos, restaure itens ou
+                remova-os definitivamente.
+            </p>
+        </header>
+
+        <div class="card bg-dark text-light border-secondary rounded-4">
+            <div class="card-header bg-transparent border-secondary p-4">
+                <div class="d-flex align-items-start gap-3">
+
+                    <div class="lixeira-icone-cabecalho">
+                        <svg lucideTrash [size]="22" aria-hidden="true"></svg>
+                    </div>
+
+                    <div class="flex-grow-1">
+
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                            <div>
+                                <h2 class="h5 fw-semibold mb-1">Produtos excluídos</h2>
+                                <p class="text-secondary small mb-0">
+                                    Gerencie os itens enviados à lixeira.
+                                </p>
+                            </div>
+
+                            <span class="lixeira-contador">
+                                {{ produtosExcluidos().length }} itens
+                            </span>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-2 mt-3 lixeira-info">
+                            <svg lucideInfo [size]="17" class="flex-shrink-0" aria-hidden="true"></svg>
+                            <p class="text-secondary small mb-0">
+                                Os produtos permanecem na lixeira por 30 dias após a exclusão.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+
+                @if(carregando()) {
+                <div class="text-center py-5">
+                    <p class="text-secondary mb-0">
+                        Carregando produtos da lixeira...
+                    </p>
+                </div>
+                } @else if (erro()) {
+                <div class="alert alert-danger" role="alert">
+                    {{ erro() }}
+                </div>
+                } @else if (produtosExcluidos().length === 0) {
+                <div class="text-center py-5">
+                    <h3 class="h5 fw-semibold">
+                        Sua lixeira está vazia
+                    </h3>
+
+                    <p class="text-secondary mb-0">
+                        Nenhum produto excluído no momento.
+                    </p>
+                </div>
+                } @else {
+                <div class="d-flex flex-column gap-3">
+                    @for (produto of produtosExcluidos(); track produto.id) {
+                    <div class="lixeira-produto-card">
+
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+                            <div>
+                                <h3 class="h6 fw-semibold mb-2">{{ produto.nome }}</h3>
+
+                                @if (produto.descricao) {
+                                <p class="text-secondary small mb-0">
+                                    {{ produto.descricao }}
+                                </p>
+                                }
+                            </div>
+
+                            <span class="lixeira-status">Na lixeira</span>
+                        </div>
+
+                        <div class="lixeira-detalhes mt-4">
+
+                            <span class="lixeira-detalhe">
+                                <svg lucideHash [size]="17" aria-hidden="true"></svg>
+                                {{ produto.id }}
+                            </span>
+
+                            <span class="lixeira-detalhe">
+                                <svg lucidePackage [size]="17" aria-hidden="true"></svg>
+                                {{ produto.quantidade }} unidades
+                            </span>
+
+                            <span class="lixeira-detalhe">
+                                <svg lucideWallet [size]="17" aria-hidden="true"></svg>
+                                {{ produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) }}
+                            </span>
+
+                        </div>
+
+                        <hr class="lixeira-divisor">
+
+                        <div class="lixeira-prazo">
+                            <svg lucideClock3 [size]="18" aria-hidden="true"></svg>
+
+                            @let restantes = diasRestantes(produto.dataExclusao);
+
+                            @if (restantes === null) {
+                            <span>Prazo de recuperação indisponível</span>
+                            } @else if (restantes === 0) {
+                            <span>Prazo de recuperação encerrado</span>
+                            } @else {
+                            <span>
+                                Restam {{ restantes }}
+                                {{ restantes === 1 ? 'dia' : 'dias' }} para recuperação
+                            </span>
+                            }
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mt-3">
+
+                            <button type="button"
+                                class="btn lixeira-btn-restaurar d-inline-flex align-items-center gap-2" disabled>
+                                <svg lucideRotateCcw [size]="18" aria-hidden="true"></svg>
+                                Restaurar
+                            </button>
+
+                            <button type="button" class="btn lixeira-btn-excluir d-inline-flex align-items-center gap-2"
+                                disabled>
+                                <svg lucideTrash [size]="18" aria-hidden="true"></svg>
+                                Excluir definitivamente
+                            </button>
+
+                        </div>
+
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+
+        </div>
+    </div>
+
+</section>

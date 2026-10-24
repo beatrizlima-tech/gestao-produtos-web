@@ -93,7 +93,6 @@
 .produtos-toolbar {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   margin-bottom: 24px;
 }
 
@@ -136,10 +135,6 @@
 
 .produtos-search input::placeholder {
   color: #96a3b6;
-}
-
-.produtos-search input::-webkit-search-cancel-button {
-  cursor: pointer;
 }
 
 .produtos-empty {
@@ -186,10 +181,6 @@
   line-height: 1.7;
   max-width: 380px;
   margin: 0;
-}
-
-.produtos-table {
-  width: 100%;
 }
 
 .produtos-table th,
