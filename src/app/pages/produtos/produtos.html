@@ -105,7 +105,79 @@
 
           } @else {
 
-          <div class="table-responsive">
+          <div class="d-lg-none d-grid gap-3">
+
+            @for (item of produtosFiltrados(); track item.id) {
+
+            <div class="card bg-dark text-light border-secondary rounded-4">
+              <div class="card-body p-3">
+
+                <div class="d-flex justify-content-between gap-2 mb-3">
+                  <div class="flex-grow-1" style="min-width: 0;">
+                    <div class="fw-semibold text-break">
+                      {{ item.nome }}
+                    </div>
+
+                    @if (item.descricao) {
+                    <p class="small text-secondary mt-1 mb-0 text-break">
+                      {{ item.descricao }}
+                    </p>
+                    }
+                  </div>
+
+                  <span class="text-secondary small">
+                    #{{ item.id }}
+                  </span>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-6">
+                    <div class="small text-secondary">Preço unitário</div>
+                    <div class="fw-semibold text-break">
+                      {{ item.preco | currency:'BRL':'symbol':'1.2-2' }}
+                    </div>
+                  </div>
+
+                  <div class="col-6">
+                    <div class="small text-secondary">Quantidade</div>
+                    <div class="fw-semibold">
+                      {{ item.quantidade | number:'1.0-0' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-top border-secondary pt-3 mb-3">
+                  <div class="small text-secondary">Valor total</div>
+                  <div class="fs-5 fw-bold text-break">
+                    {{ item.total | currency:'BRL':'symbol':'1.2-2' }}
+                  </div>
+                </div>
+
+                <div class="row g-2">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-outline-warning w-100 rounded-3" data-bs-toggle="modal"
+                      data-bs-target="#modalEdicao" (click)="obterDados(item.id)">
+                      Editar
+                    </button>
+                  </div>
+
+                  <div class="col-6">
+                    <button type="button" class="btn btn-outline-danger w-100 rounded-3" data-bs-toggle="modal"
+                      data-bs-target="#modalExclusao"
+                      (click)="selecionarProdutoParaExcluir(item); confirmacaoExclusao.set(false); erroExclusao.set('')">
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            }
+
+          </div>
+
+          <div class="table-responsive d-none d-lg-block">
             <table class="table table-dark table-hover align-middle mb-0 produtos-table">
 
               <thead>
@@ -137,7 +209,7 @@
                   </td>
 
                   <td>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</td>
-                  <td>{{ item.quantidade }}</td>
+                  <td>{{ item.quantidade | number:'1.0-0':'pt-BR' }}</td>
                   <td>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</td>
 
                   <td class="text-center">
@@ -187,6 +259,13 @@
         </div>
 
         <div class="modal-body">
+
+          @if (erroEdicao()) {
+          <div class="alert alert-danger mb-3" role="alert">
+            {{ erroEdicao() }}
+          </div>
+          }
+
           <form [formGroup]="formEdicao" (ngSubmit)="atualizar()">
 
             <div class="row g-3 mb-3">
@@ -219,25 +298,31 @@
             </div>
 
             <div class="row g-3">
-              <div class="col-4">
+              <div class="col-12 col-sm-4">
                 <label class="form-label text-secondary small">
                   Preço (R$)
                 </label>
 
-                <input type="number" formControlName="preco"
-                  class="form-control bg-dark text-light border-secondary rounded-3" step="0.01">
+                <input type="text" inputmode="decimal" id="precoEdicao"
+                  class="form-control bg-dark text-light border-secondary rounded-3" [value]="precoExibicao"
+                  (input)="formatarPreco($event)"
+                  [class.is-invalid]="formEdicao.controls.preco.touched && formEdicao.controls.preco.invalid">
+
               </div>
 
-              <div class="col-4">
+              <div class="col-12 col-sm-4">
                 <label class="form-label text-secondary small">
                   Quantidade
                 </label>
 
-                <input type="number" formControlName="quantidade"
-                  class="form-control bg-dark text-light border-secondary rounded-3">
+                <input type="text" inputmode="numeric" id="quantidadeEdicao"
+                  class="form-control bg-dark text-light border-secondary rounded-3" [value]="quantidadeExibicao"
+                  (input)="formatarQuantidade($event)"
+                  [class.is-invalid]="formEdicao.controls.quantidade.touched && formEdicao.controls.quantidade.invalid">
+
               </div>
 
-              <div class="col-4">
+              <div class="col-12 col-sm-4">
                 <label class="form-label text-secondary small">
                   Total
                 </label>
@@ -247,9 +332,16 @@
               </div>
             </div>
 
-            <div class="mt-4">
-              <button type="submit" class="btn btn-warning rounded-3" [disabled]="formEdicao.invalid">
-                Salvar alterações
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+
+              <button type="button" class="btn btn-outline-light rounded-3" data-bs-dismiss="modal"
+                [disabled]="salvandoEdicao()" (click)="limparEdicao()">
+                Cancelar
+              </button>
+
+              <button type="submit" class="btn btn-warning rounded-3"
+                [disabled]="formEdicao.invalid || salvandoEdicao()">
+                {{ salvandoEdicao() ? 'Salvando...' : 'Salvar alterações' }}
               </button>
             </div>
 

@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+.app-main {
+  width: 100%;
+  max-width: 1500px;
+  margin-inline: auto;
+  min-width: 0;
+}

@@ -1,35 +1,29 @@
 <div class="bg-dark text-light min-vh-100">
 
-<nav class="navbar navbar-dark bg-black border-bottom border=secondary px-4 py-3">
+  <nav class="navbar navbar-dark bg-black border-bottom border=secondary px-4 py-3">
 
-<a class="navbar-brand fw-bold" routerLink="/">
-  Gestão de Produtos  
-</a>
+    <a class="navbar-brand fw-bold" routerLink="/">
+      Gestão de Produtos
+    </a>
 
-<div class="d-flex gap-3">
-  <a
-    routerLink = "/" 
-    class="btn btn-outline-light">
-    Início
-  </a>
-  
-  <a
-    routerLink = "/produtos"
-    class="btn btn-outline-light">
-    Produtos
-  </a>
+    <div class="d-flex gap-3">
+      <a routerLink="/" class="btn btn-outline-light">
+        Início
+      </a>
 
-  <a
-    routerLink="/lixeira"
-    class="btn btn-outline-light d-inline-flex align-items-center gap-2">
-    Lixeira
-  </a>
-</div>
+      <a routerLink="/produtos" class="btn btn-outline-light">
+        Produtos
+      </a>
 
-</nav>
+      <a routerLink="/lixeira" class="btn btn-outline-light d-inline-flex align-items-center gap-2">
+        Lixeira
+      </a>
+    </div>
 
-<main class="container-fluid px-4 px-lg-5 py-4">
-  <router-outlet></router-outlet>
-</main>
+  </nav>
+
+  <main class="app-main container-fluid px-2 px-sm-3 px-lg-4 py-4">
+    <router-outlet></router-outlet>
+  </main>
 
 </div>

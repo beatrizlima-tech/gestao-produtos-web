@@ -28,11 +28,25 @@ export class Produtos {
 
   notificacao = signal('');
 
+  precoExibicao = '';
+
+  quantidadeExibicao = '';
+
   produtoParaExcluir = signal<any | null>(null);
 
   excluindo = signal(false);
   erroExclusao = signal('');
   confirmacaoExclusao = signal(false);
+
+  salvandoEdicao = signal(false);
+  erroEdicao = signal('');
+
+  limparEdicao(): void {
+    this.formEdicao.reset();
+    this.precoExibicao = '';
+    this.quantidadeExibicao = '';
+    this.erroEdicao.set('');
+  }
 
   produtosFiltrados = computed(() => {
     const termo = this.busca().trim().toLowerCase();
@@ -49,18 +63,105 @@ export class Produtos {
       })
   }
 
+
+  formatarPreco(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const texto = input.value.replace(/[^\d,]/g, '');
+    const [inteiros = '', ...partesDecimais] = texto.split(',');
+
+    const parteInteira = inteiros
+      .replace(/^0+(?=\d)/, '');
+
+    const decimais = partesDecimais
+      .join('')
+      .slice(0, 2);
+
+    const possuiVirgula = texto.includes(',');
+
+    const formatado = parteInteira
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+      + (possuiVirgula ? ',' + decimais : '');
+
+    this.precoExibicao = formatado;
+    input.value = formatado;
+
+    const numero = parteInteira
+      ? Number(parteInteira + (possuiVirgula ? '.' + decimais : ''))
+      : null;
+
+    this.formEdicao.controls.preco.setValue(
+      numero === null ? '' : String(numero)
+    );
+
+    this.formEdicao.controls.preco.markAsDirty();
+  }
+
+  formatarQuantidade(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    const digitos = input.value.replace(/\D/g, '');
+    const quantidade = digitos.replace(/^0+(?=\d)/, '');
+
+    this.quantidadeExibicao = quantidade
+      ? Number(quantidade).toLocaleString('pt-BR')
+      : '';
+
+    input.value = this.quantidadeExibicao;
+
+    this.formEdicao.controls.quantidade.setValue(quantidade);
+    this.formEdicao.controls.quantidade.markAsDirty();
+  }
+
   formEdicao = new FormGroup({
     id: new FormControl('', [Validators.required]),
-    nome: new FormControl('', [Validators.required]),
+
+    nome: new FormControl('', [
+      Validators.required,
+      Validators.pattern(/.*\S.*/),
+      Validators.maxLength(150)
+    ]),
+
+    preco: new FormControl('', [
+      Validators.required,
+      Validators.min(0.01)
+    ]),
+
+    quantidade: new FormControl('', [
+      Validators.required,
+      Validators.min(0),
+      Validators.pattern(/^\d+$/)
+    ]),
+
     descricao: new FormControl('', [Validators.maxLength(500)]),
-    preco: new FormControl('', [Validators.required]),
-    quantidade: new FormControl('', [Validators.required]),
+
     total: new FormControl('', [Validators.required]),
   });
 
+  constructor() {
+    this.formEdicao.controls.preco.valueChanges.subscribe(() => {
+      this.recalcularTotal();
+    });
+
+    this.formEdicao.controls.quantidade.valueChanges.subscribe(() => {
+      this.recalcularTotal();
+    });
+  }
+
   obterDados(id: number) {
+
+    this.formEdicao.reset();
+    this.precoExibicao = '';
+    this.quantidadeExibicao = '';
+    this.erroEdicao.set('');
+
     this.http.get(this.apiUrl + "/" + id)
       .subscribe((data: any) => {
+        this.precoExibicao = Number(data.preco).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        });
+        this.quantidadeExibicao = Number(data.quantidade).toLocaleString('pt-BR');
         this.formEdicao.patchValue({
           id: data.id,
           nome: data.nome,
@@ -75,31 +176,56 @@ export class Produtos {
       })
   }
 
+
   atualizar() {
+    this.formEdicao.markAllAsTouched();
+
+    if (this.formEdicao.invalid || this.salvandoEdicao()) {
+      return;
+    }
+
+    this.salvandoEdicao.set(true);
+    this.erroEdicao.set('');
+    this.notificacao.set('');
+
     const produtoAtualizado = {
       nome: this.formEdicao.value.nome,
       descricao: this.formEdicao.value.descricao,
-      preco: this.formEdicao.value.preco,
-      quantidade: this.formEdicao.value.quantidade
+      preco: Number(this.formEdicao.value.preco),
+      quantidade: Number(this.formEdicao.value.quantidade)
     };
 
-    this.http.put(
-      this.apiUrl + "/" + this.formEdicao.value.id,
+    this.http.put<{ nome: string }>(
+      `${this.apiUrl}/${this.formEdicao.value.id}`,
       produtoAtualizado
-    )
-      .subscribe((data: any) => {
+    ).subscribe({
+      next: (produto) => {
         this.notificacao.set(
-          `Produto "${data.nome}" atualizado com sucesso!`
+          `Produto "${produto.nome}" atualizado com sucesso!`
         );
+
+        document
+          .querySelector<HTMLButtonElement>('#modalEdicao .btn-close')
+          ?.click();
+
         this.formEdicao.reset();
+        this.salvandoEdicao.set(false);
         this.ngOnInit();
-      });
+      },
+
+      error: () => {
+        this.erroEdicao.set(
+          'Não foi possível atualizar o produto. Verifique os dados e tente novamente.'
+        );
+
+        this.salvandoEdicao.set(false);
+      }
+    });
   }
 
   selecionarProdutoParaExcluir(produto: any) {
     this.produtoParaExcluir.set(produto);
   }
-
 
   confirmarExclusao() {
     const produto = this.produtoParaExcluir();
@@ -135,7 +261,6 @@ export class Produtos {
     });
   }
 
-
   excluir(id: number) {
     if (confirm('Deseja realmente excluir este produto?')) {
       this.http.delete(this.apiUrl + "/" + id)
@@ -146,5 +271,20 @@ export class Produtos {
     }
   }
 
+  private recalcularTotal(): void {
+    const preco = Number(this.formEdicao.controls.preco.value) || 0;
+    const quantidade = Number(this.formEdicao.controls.quantidade.value) || 0;
+
+    const total = preco * quantidade;
+
+    const totalFormatado = total.toLocaleString('pt-BR', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    this.formEdicao.controls.total.setValue(totalFormatado, {
+      emitEvent: false
+    });
+  }
 
 }
