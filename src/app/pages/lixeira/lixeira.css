@@ -167,3 +167,27 @@
   color: #93c5fd;
   margin-top: 2px;
 }
+
+
+.lixeira-notificacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  background: #15382e;
+  border: 1px solid #28785e;
+  border-radius: 12px;
+  color: #bbf7d0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.lixeira-notificacao button {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 24px;
+  cursor: pointer;
+}

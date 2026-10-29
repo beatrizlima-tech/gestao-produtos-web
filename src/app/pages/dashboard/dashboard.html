@@ -40,7 +40,7 @@
                 {{ carregando() ? '...' : erro() ? '-' : totalProdutos()}}
             </strong>
 
-            <p>Total de produtos cadastrados</p>
+            <p>Produtos disponíveis no catálogo</p>
         </article>
 
         <article class="dash-stat">
@@ -125,6 +125,28 @@
                 <span class="dash-action-label">NOVO CADASTRO</span>
                 <h3>Cadastrar produto</h3>
                 <p>Adicione novos itens ao seu estoque.</p>
+            </div>
+
+            <span class="dash-action-arrow" aria-hidden="true">→</span>
+
+        </a>
+
+        <a routerLink="/lixeira" class="dash-action">
+
+            <span class="dash-action-symbol" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 6h18"></path>
+                    <path d="M8 6V4h8v2"></path>
+                    <path d="M5 6l1 15h12l1-15"></path>
+                    <path d="M10 10v7"></path>
+                    <path d="M14 10v7"></path>
+                </svg>
+            </span>
+
+            <div class="dash-action-content">
+                <span class="dash-action-label">RECUPERAÇÃO</span>
+                <h3>Acessar lixeira</h3>
+                <p>Consulte e gerencie os produtos excluídos.</p>
             </div>
 
             <span class="dash-action-arrow" aria-hidden="true">→</span>

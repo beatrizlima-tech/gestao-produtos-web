@@ -35,7 +35,8 @@
                             </div>
 
                             <span class="lixeira-contador">
-                                {{ produtosExcluidos().length }} itens
+                                {{ produtosExcluidos().length }} {{ produtosExcluidos().length === 1 ? 'item' : 'itens'
+                                }}
                             </span>
                         </div>
 
@@ -51,6 +52,16 @@
             </div>
 
             <div class="card-body p-4">
+
+                @if (mensagemSucesso()) {
+                <div class="lixeira-notificacao" role="status">
+                    <span>{{ mensagemSucesso() }}</span>
+
+                    <button type="button" aria-label="Fechar notificação" (click)="mensagemSucesso.set('')">
+                        ×
+                    </button>
+                </div>
+                }
 
                 @if(carregando()) {
                 <div class="text-center py-5">
@@ -132,15 +143,23 @@
                         <div class="d-flex flex-wrap gap-2 mt-3">
 
                             <button type="button"
-                                class="btn lixeira-btn-restaurar d-inline-flex align-items-center gap-2" disabled>
+                                class="btn lixeira-btn-restaurar d-inline-flex align-items-center gap-2"
+                                [disabled]="restaurandoId() !== null" data-bs-toggle="modal"
+                                data-bs-target="#modalRestauracao" (click)="selecionarProdutoParaRestaurar(produto)">
+
                                 <svg lucideRotateCcw [size]="18" aria-hidden="true"></svg>
                                 Restaurar
+
                             </button>
 
                             <button type="button" class="btn lixeira-btn-excluir d-inline-flex align-items-center gap-2"
-                                disabled>
+                                [disabled]="excluindoDefinitivamente()" data-bs-toggle="modal"
+                                data-bs-target="#modalExclusaoDefinitiva"
+                                (click)="selecionarProdutoParaExcluirDefinitivamente(produto)">
+
                                 <svg lucideTrash [size]="18" aria-hidden="true"></svg>
                                 Excluir definitivamente
+
                             </button>
 
                         </div>
@@ -151,6 +170,195 @@
                 }
             </div>
 
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalRestauracao" tabindex="-1" aria-labelledby="tituloModalRestauracao"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border-secondary rounded-4">
+
+                <div class="modal-header border-secondary p-4">
+                    <div>
+                        <h5 class="modal-title fw-semibold" id="tituloModalRestauracao">
+                            @if (confirmacaoRestauracao()) {
+                            Confirmar restauração
+                            } @else {
+                            Restaurar produto?
+                            }
+                        </h5>
+                        <p class="text-secondary small mb-0 mt-2">
+                            Confira o produto antes de continuar.
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="Fechar"></button>
+                </div>
+
+                <div class="modal-body p-4">
+
+                    @if (produtoParaRestaurar(); as produto) {
+
+                    <div class="rounded-3 p-3 mb-4" style="background: #202936; border: 1px solid #384355;">
+                        <div class="fw-semibold">{{ produto.nome }}</div>
+
+                        @if (produto.descricao) {
+                        <p class="text-secondary small mt-2 mb-0">
+                            {{ produto.descricao }}
+                        </p>
+                        }
+                    </div>
+
+                    @if (!confirmacaoRestauracao()) {
+
+                    <div class="rounded-3 p-3 mb-4" style="background: #263445; border: 1px solid #425573;">
+                        <strong style="color: #93c5fd;">
+                            O produto voltará ao estoque.
+                        </strong>
+                        <p class="text-light small mt-2 mb-0">
+                            Ele deixará a Lixeira e voltará à lista de produtos ativos.
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="button" class="btn btn-primary" (click)="confirmacaoRestauracao.set(true)">
+                            Continuar
+                        </button>
+                    </div>
+
+                    } @else {
+
+                    <p class="mb-4">
+                        Tem certeza de que deseja restaurar este produto?
+                    </p>
+
+                    @if (erroRestauracao()) {
+                    <div class="alert alert-danger mb-3" role="alert">
+                        {{ erroRestauracao() }}
+                    </div>
+                    }
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn btn-outline-light" (click)="confirmacaoRestauracao.set(false)">
+                            Não, voltar
+                        </button>
+                        <button type="button" class="btn btn-primary rounded-3 px-4"
+                            [disabled]="restaurandoId() !== null" (click)="restaurarProduto(produto)">
+
+                            {{ restaurandoId() === produto.id ? 'Restaurando...' : 'Sim, restaurar' }}
+
+                        </button>
+                    </div>
+
+                    }
+                    }
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="modalExclusaoDefinitiva" tabindex="-1" aria-labelledby="tituloModalExclusaoDefinitiva"
+        aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-dark text-light border-secondary rounded-4">
+
+                <div class="modal-header border-secondary p-4">
+                    <div>
+                        <h5 class="modal-title fw-semibold" id="tituloModalExclusaoDefinitiva">
+                            @if (confirmacaoExclusaoDefinitiva()) {
+                            Confirmar exclusão definitiva
+                            } @else {
+                            Excluir produto definitivamente?
+                            }
+                        </h5>
+
+                        <p class="text-secondary small mb-0 mt-2">
+                            Esta operação exige sua confirmação.
+                        </p>
+                    </div>
+
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar">
+                    </button>
+                </div>
+
+                <div class="modal-body p-4">
+                    @if (produtoParaExcluirDefinitivamente(); as produto) {
+
+                    <div class="rounded-3 p-3 mb-4" style="background: #202936; border: 1px solid #384355;">
+                        <div class="fw-semibold">{{ produto.nome }}</div>
+
+                        @if (produto.descricao) {
+                        <p class="text-secondary small mt-2 mb-0">
+                            {{ produto.descricao }}
+                        </p>
+                        }
+                    </div>
+
+                    @if (!confirmacaoExclusaoDefinitiva()) {
+
+                    <div class="rounded-3 p-3 mb-4" style="background: #3b292e; border: 1px solid #92515c;">
+
+                        <strong style="color: #fecdd3;">
+                            Atenção: esta ação é irreversível.
+                        </strong>
+
+                        <p class="small mt-2 mb-0" style="color: #fecdd3;">
+                            O produto será removido permanentemente
+                            e não poderá ser recuperado.
+                        </p>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                        <button type="button" class="btn btn-outline-light rounded-3 px-4" data-bs-dismiss="modal">
+                            Cancelar
+                        </button>
+
+                        <button type="button" class="btn btn-danger rounded-3 px-4"
+                            (click)="confirmacaoExclusaoDefinitiva.set(true)">
+                            Continuar
+                        </button>
+                    </div>
+
+                    } @else {
+
+                    <h6 class="fw-semibold mb-2">
+                        Tem certeza de que deseja excluir permanentemente este produto?
+                    </h6>
+
+                    <p class="small mb-4" style="color: #fecdd3;">
+                        Após confirmar, não será possível restaurar os dados do produto.
+                    </p>
+
+                    @if (erroExclusaoDefinitiva()) {
+                    <div class="alert alert-danger" role="alert">
+                        {{ erroExclusaoDefinitiva() }}
+                    </div>
+                    }
+
+                    <div class="d-flex justify-content-end gap-2 flex-wrap">
+                        <button type="button" class="btn btn-outline-light rounded-3 px-4"
+                            (click)="confirmacaoExclusaoDefinitiva.set(false)">
+                            Não, voltar
+                        </button>
+
+                        <button type="button" class="btn btn-danger rounded-3 px-4"
+                            [disabled]="excluindoDefinitivamente()" (click)="excluirProdutoDefinitivamente(produto)">
+                            {{ excluindoDefinitivamente() ? 'Excluindo...' : 'Sim, excluir definitivamente' }}
+                        </button>
+                    </div>
+
+                    }
+                    }
+                </div>
+            </div>
         </div>
     </div>
 
