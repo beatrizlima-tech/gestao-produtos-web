@@ -67,6 +67,20 @@ export class Produtos {
   formatarPreco(event: Event): void {
     const input = event.target as HTMLInputElement;
 
+    const formatoValido =
+      /^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{0,2})?$/.test(input.value);
+
+    if (input.value !== '' && !formatoValido) {
+
+      this.precoExibicao = input.value;
+
+      this.formEdicao.controls.preco.setValue('');
+      this.formEdicao.controls.preco.markAsTouched();
+      this.formEdicao.controls.preco.markAsDirty();
+
+      return;
+    }
+
     const texto = input.value.replace(/[^\d,]/g, '');
     const [inteiros = '', ...partesDecimais] = texto.split(',');
 
@@ -99,19 +113,37 @@ export class Produtos {
 
   formatarQuantidade(event: Event): void {
     const input = event.target as HTMLInputElement;
+    const texto = input.value;
 
-    const digitos = input.value.replace(/\D/g, '');
+    const formatoValido =
+      /^(?:\d+|\d{1,3}(?:\.\d{3})+)$/.test(texto);
+
+    if (texto !== '' && !formatoValido) {
+
+      this.quantidadeExibicao = texto;
+
+      this.formEdicao.controls.quantidade.setValue('');
+      this.formEdicao.controls.quantidade.markAsTouched();
+      this.formEdicao.controls.quantidade.markAsDirty();
+
+      return;
+    }
+
+    const digitos = texto.replace(/\./g, '');
+
     const quantidade = digitos.replace(/^0+(?=\d)/, '');
 
-    this.quantidadeExibicao = quantidade
-      ? Number(quantidade).toLocaleString('pt-BR')
-      : '';
+    this.quantidadeExibicao = quantidade.replace(
+      /\B(?=(\d{3})+(?!\d))/g,
+      '.'
+    );
 
     input.value = this.quantidadeExibicao;
 
     this.formEdicao.controls.quantidade.setValue(quantidade);
     this.formEdicao.controls.quantidade.markAsDirty();
   }
+
 
   formEdicao = new FormGroup({
     id: new FormControl('', [Validators.required]),
