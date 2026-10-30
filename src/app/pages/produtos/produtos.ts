@@ -44,6 +44,8 @@ export class Produtos {
   salvandoEdicao = signal(false);
   erroEdicao = signal('');
 
+  carregandoEdicao = signal(false);
+
   limparEdicao(): void {
     this.formEdicao.reset();
     this.precoExibicao = '';
@@ -202,9 +204,10 @@ export class Produtos {
     this.precoExibicao = '';
     this.quantidadeExibicao = '';
     this.erroEdicao.set('');
+    this.carregandoEdicao.set(true);
 
-    this.produtoService.buscarPorId(id)
-      .subscribe((data) => {
+    this.produtoService.buscarPorId(id).subscribe({
+      next: (data) => {
         this.precoExibicao = data.preco.toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
@@ -223,7 +226,18 @@ export class Produtos {
             maximumFractionDigits: 2
           })
         });
-      });
+
+        this.carregandoEdicao.set(false);
+      },
+
+      error: () => {
+        this.erroEdicao.set(
+          'Não foi possível carregar os dados do produto. Feche a janela e tente novamente.'
+        );
+
+        this.carregandoEdicao.set(false);
+      }
+    });
   }
 
   atualizar() {

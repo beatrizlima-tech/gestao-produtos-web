@@ -286,6 +286,12 @@
 
         <div class="modal-body">
 
+          @if (carregandoEdicao()) {
+            <div class="alert alert-info mb-3" role="status">
+              Carregando dados do produto...
+            </div>
+          }
+
           @if (erroEdicao()) {
           <div class="alert alert-danger mb-3" role="alert">
             {{ erroEdicao() }}
@@ -380,7 +386,7 @@
               </button>
 
               <button type="submit" class="btn btn-warning rounded-3"
-                [disabled]="formEdicao.invalid || salvandoEdicao()">
+                [disabled]="formEdicao.invalid || salvandoEdicao() || carregandoEdicao()">
                 {{ salvandoEdicao() ? 'Salvando...' : 'Salvar alterações' }}
               </button>
 

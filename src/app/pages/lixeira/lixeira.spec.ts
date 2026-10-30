@@ -1,3 +1,4 @@
+import { vi } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClient } from '@angular/common/http';
 import {
@@ -204,6 +205,31 @@ describe('Lixeira', () => {
         );
 
         expect(component.mensagemSucesso()).toBe('');
+    });
+
+    it('deve calcular corretamente os dias restantes na lixeira', () => {
+        const agora = new Date('2026-10-30T12:00:00Z');
+
+        const relogio = vi.spyOn(Date, 'now')
+            .mockReturnValue(agora.getTime());
+
+        try {
+            expect (
+                component.diasRestantes('2026-10-20T12:00:00Z')
+            ).toBe(20);
+
+            expect(
+                component.diasRestantes('2026-09-01T12:00:00Z')
+            ).toBe(0);
+
+            expect(component.diasRestantes(null)).toBeNull();
+
+            expect (
+                component.diasRestantes('data-invalida')
+            ).toBeNull();
+        } finally {
+            relogio.mockRestore();
+        }
     });
 
 });

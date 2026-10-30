@@ -385,4 +385,36 @@ describe('Produtos', () => {
     expect(component.formEdicao.invalid).toBe(true);
   });
 
+  it('deve informar erro quando não conseguir carregar o produto para edição', () => {
+    component.obterDados(52);
+
+    expect(component.carregandoEdicao()).toBe(true);
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/52`);
+
+    expect(requisicao.request.method).toBe('GET');
+
+    requisicao.flush('Erro interno', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+
+    fixture.detectChanges();
+
+    expect(component.carregandoEdicao()).toBe(false);
+
+    expect(component.erroEdicao()).toContain(
+      'Não foi possível carregar os dados do produto'
+    );
+
+    expect(component.formEdicao.invalid).toBe(true);
+
+    const tela = fixture.nativeElement as HTMLElement;
+
+    expect(tela.textContent).toContain(
+      'Não foi possível carregar os dados do produto'
+    );
+
+  });
+
 });
