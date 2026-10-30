@@ -66,7 +66,33 @@
 
         <div class="table-responsive">
 
-          @if (produtos().length === 0) {
+          @if (carregando()) {
+
+          <div class="produtos-empty" role="status">
+            <div class="spinner-border text-primary mb-3" aria-hidden="true"></div>
+
+            <h3>Carregando produtos...</h3>
+
+            <p>
+              Aguarde enquanto consultamos os produtos cadastrados.
+            </p>
+          </div>
+          } @else if (erroCarregamento()) {
+
+          <div class="produtos-empty" role="alert">
+            <h3>Não foi possível carregar os produtos</h3>
+
+            <p>
+              Ocorreu um problema ao consultar a API.
+              Verifique a conexão e tente novamente.
+            </p>
+
+            <button type="button" class="btn btn-primary rounded-3" (click)="carregarProdutos()">
+              Tentar novamente
+            </button>
+          </div>
+
+          } @else if (produtos().length === 0) {
 
           <div class="produtos-empty">
             <div class="produtos-empty-icon">

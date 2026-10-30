@@ -24,6 +24,10 @@ export class Produtos {
 
   produtos = signal<any[]>([]);
 
+  carregando = signal(true);
+
+  erroCarregamento = signal(false);
+
   busca = signal('');
 
   notificacao = signal('');
@@ -56,11 +60,26 @@ export class Produtos {
     );
   });
 
-  ngOnInit() {
-    this.http.get(this.apiUrl)
-      .subscribe((data) => {
-        this.produtos.set(data as any[]);
-      })
+  ngOnInit(): void {
+    this.carregarProdutos();
+  }
+
+  carregarProdutos(): void {
+    this.carregando.set(true);
+    this.erroCarregamento.set(false);
+
+    this.http.get<any[]>(this.apiUrl).subscribe({
+      next: (dados) => {
+        this.produtos.set(dados);
+        this.carregando.set(false);
+      },
+
+      error: () => {
+        this.produtos.set([]);
+        this.erroCarregamento.set(true);
+        this.carregando.set(false);
+      }
+    });
   }
 
 

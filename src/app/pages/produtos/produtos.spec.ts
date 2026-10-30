@@ -234,4 +234,111 @@ describe('Produtos', () => {
     expect(component.formEdicao.controls.total.value).toBe('80,00');
   });
 
+  it('deve mostrar erro quando a listagem falhar', () => {
+    component.carregarProdutos();
+
+    expect(component.carregando()).toBe(true);
+
+    const requisicao = httpMock.expectOne(apiUrl);
+
+    requisicao.flush('Erro interno', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+
+    fixture.detectChanges();
+
+    expect(component.carregando()).toBe(false);
+    expect(component.erroCarregamento()).toBe(true);
+
+    const tela = fixture.nativeElement as HTMLElement;
+
+    expect(tela.textContent).toContain(
+      'Não foi possível carregar os produtos'
+    );
+
+    expect(tela.textContent).not.toContain(
+      'Seu catálogo está vazio'
+    );
+  });
+
+
+  it('deve mostrar catálogo vazio quando a API retornar lista vazia', async () => {
+    component.carregarProdutos();
+
+    const requisicao = httpMock.expectOne(apiUrl);
+
+    expect(requisicao.request.method).toBe('GET');
+
+    requisicao.flush([]);
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.carregando()).toBe(false);
+    expect(component.erroCarregamento()).toBe(false);
+    expect(component.produtos()).toEqual([]);
+
+    const tela = fixture.nativeElement as HTMLElement;
+
+    expect(tela.textContent).toContain(
+      'Seu catálogo está vazio'
+    );
+
+    expect(tela.textContent).not.toContain(
+      'Notebook Lenovo'
+    );
+
+    expect(tela.textContent).not.toContain(
+      'Não foi possível carregar os produtos'
+    );
+  });
+
+  it('deve permitir tentar carregar os produtos novamente', async () => {
+    
+    component.carregarProdutos();
+
+    const primeiraRequisicao = httpMock.expectOne(apiUrl);
+
+    primeiraRequisicao.flush('Erro interno', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.erroCarregamento()).toBe(true);
+
+    const tela = fixture.nativeElement as HTMLElement;
+
+    const botao = Array.from(
+      tela.querySelectorAll('button')
+    ).find(elemento =>
+      elemento.textContent?.trim() === 'Tentar novamente'
+    );
+
+    expect(botao).toBeTruthy();
+
+    botao!.click();
+
+    const segundaRequisicao = httpMock.expectOne(apiUrl);
+
+    expect(segundaRequisicao.request.method).toBe('GET');
+
+    segundaRequisicao.flush([produto]);
+
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(component.erroCarregamento()).toBe(false);
+    expect(component.carregando()).toBe(false);
+    expect(component.produtos()).toEqual([produto]);
+
+    expect(tela.textContent).toContain('Notebook Lenovo');
+    expect(tela.textContent).not.toContain(
+      'Não foi possível carregar os produtos'
+    );
+  });
+
 });
