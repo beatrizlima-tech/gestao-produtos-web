@@ -1,18 +1,9 @@
 
 import { Component, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { LucideClock3, LucideHash, LucideInfo, LucidePackage, LucideRotateCcw, LucideTrash, LucideWallet } from '@lucide/angular';
 import 'bootstrap/dist/js/bootstrap.esm.min.js';
-
-interface ProdutoLixeira {
-  id: number;
-  nome: string;
-  descricao: string | null;
-  preco: number;
-  quantidade: number;
-  total: number;
-  dataExclusao: string | null;
-}
+import { ProdutoLixeira } from '../../models/produto.model';
+import { ProdutoService } from '../../services/produto.service';
 
 @Component({
   selector: 'app-lixeira',
@@ -29,10 +20,7 @@ interface ProdutoLixeira {
 })
 export class Lixeira {
 
-  private readonly http = inject(HttpClient);
-
-  private readonly produtosApiUrl = 'http://localhost:8081/api/v1/produtos';
-  private readonly apiUrl = `${this.produtosApiUrl}/lixeira`;
+  private readonly produtoService = inject(ProdutoService);
 
   produtosExcluidos = signal<ProdutoLixeira[]>([]);
   carregando = signal(true);
@@ -95,10 +83,7 @@ export class Lixeira {
     this.mensagemSucesso.set('');
     this.erroRestauracao.set('');
 
-    this.http.patch<void>(
-      `${this.produtosApiUrl}/${produto.id}/restaurar`,
-      {}
-    ).subscribe({
+    this.produtoService.restaurar(produto.id).subscribe({
 
       next: () => {
         this.produtosExcluidos.update(produtos =>
@@ -132,9 +117,7 @@ export class Lixeira {
     this.erroExclusaoDefinitiva.set('');
     this.mensagemSucesso.set('');
 
-    this.http.delete<void>(
-      `${this.produtosApiUrl}/${produto.id}/definitivo`
-    ).subscribe({
+    this.produtoService.excluirDefinitivamente(produto.id).subscribe({
       next: () => {
         this.produtosExcluidos.update(produtos =>
           produtos.filter(item => item.id !== produto.id)
@@ -163,14 +146,16 @@ export class Lixeira {
     });
   }
 
-  ngOnInit() {
-    this.http.get<ProdutoLixeira[]>(this.apiUrl).subscribe({
+  ngOnInit(): void {
+    this.produtoService.listarLixeira().subscribe({
       next: (produtos) => {
         this.produtosExcluidos.set(produtos);
         this.carregando.set(false);
       },
       error: () => {
-        this.erro.set('Não foi possível carregar os produtos da lixeira.');
+        this.erro.set(
+          'Não foi possível carregar os produtos da lixeira.'
+        );
         this.carregando.set(false);
       }
     });

@@ -295,7 +295,7 @@ describe('Produtos', () => {
   });
 
   it('deve permitir tentar carregar os produtos novamente', async () => {
-    
+
     component.carregarProdutos();
 
     const primeiraRequisicao = httpMock.expectOne(apiUrl);
@@ -339,6 +339,50 @@ describe('Produtos', () => {
     expect(tela.textContent).not.toContain(
       'Não foi possível carregar os produtos'
     );
+  });
+
+  it('deve tratar erro ao mover produto para a lixeira', () => {
+    component.selecionarProdutoParaExcluir(produto);
+
+    component.confirmarExclusao();
+
+    const requisicao = httpMock.expectOne(`${apiUrl}/52`);
+
+    expect(requisicao.request.method).toBe('DELETE');
+    expect(component.excluindo()).toBe(true);
+
+    requisicao.flush('Erro interno', {
+      status: 500,
+      statusText: 'Internal Server Error'
+    });
+
+    expect(component.excluindo()).toBe(false);
+    expect(component.erroExclusao()).toContain(
+      'Não foi possível mover o produto'
+    );
+
+    expect(component.produtoParaExcluir()?.id).toBe(52);
+  })
+
+  it('deve limpar o total quando o preço tiver mais de duas casas decimais', () => {
+
+    component.formEdicao.controls.preco.setValue('5');
+    component.formEdicao.controls.quantidade.setValue('10');
+
+    expect(component.formEdicao.controls.total.value).toBe('50,00');
+
+    const input = document.createElement('input');
+    input.value = '5,000000';
+
+    component.formatarPreco({
+      target: input
+    } as unknown as Event);
+
+    expect(component.formEdicao.controls.preco.invalid).toBe(true);
+
+    expect(component.formEdicao.controls.total.value).toBe('');
+
+    expect(component.formEdicao.invalid).toBe(true);
   });
 
 });

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { ProdutoService } from '../../services/produto.service';
 import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -11,11 +11,8 @@ import { Router, RouterLink } from '@angular/router';
 })
 export class Cadastro {
 
-  private readonly http = inject(HttpClient);
+  private readonly produtoService = inject(ProdutoService);
   private readonly router = inject(Router);
-
-  private readonly apiUrl =
-    'http://localhost:8081/api/v1/produtos';
 
   readonly salvando = signal(false);
   readonly mensagemErro = signal('');
@@ -49,28 +46,42 @@ export class Cadastro {
     ])
   });
 
-  cadastrar() {
+  cadastrar(): void {
     this.formulario.markAllAsTouched();
 
-    if (this.formulario.invalid || this.salvando()) {
+    const dados = this.formulario.getRawValue();
+
+    if (
+      this.formulario.invalid ||
+      this.salvando() ||
+      dados.preco === null ||
+      dados.quantidade === null
+    ) {
       return;
     }
 
     this.mensagemErro.set('');
     this.salvando.set(true);
 
-    this.http.post(this.apiUrl, this.formulario.getRawValue())
-      .subscribe({
-        next: () => {
-          this.router.navigate(['/produtos']);
-        },
-        error: () => {
-          this.mensagemErro.set(
-            'Não foi possível cadastrar o produto. Tente novamente.'
-          );
-          this.salvando.set(false);
-        }
-      });
+    this.produtoService.cadastrar({
+      nome: dados.nome,
+      descricao: dados.descricao,
+      preco: dados.preco,
+      quantidade: dados.quantidade
+    }).subscribe({
+      next: () => {
+        this.router.navigate(['/produtos']);
+      },
+
+      error: () => {
+        this.mensagemErro.set(
+          'Não foi possível cadastrar o produto. Tente novamente.'
+        );
+
+        this.salvando.set(false);
+      }
+    });
   }
+
 
 }

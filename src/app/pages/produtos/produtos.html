@@ -292,6 +292,7 @@
           </div>
           }
 
+
           <form [formGroup]="formEdicao" (ngSubmit)="atualizar()">
 
             <div class="row g-3 mb-3">
@@ -324,8 +325,9 @@
             </div>
 
             <div class="row g-3">
+
               <div class="col-12 col-sm-4">
-                <label class="form-label text-secondary small">
+                <label for="precoEdicao" class="form-label text-secondary small">
                   Preço (R$)
                 </label>
 
@@ -333,11 +335,10 @@
                   class="form-control bg-dark text-light border-secondary rounded-3" [value]="precoExibicao"
                   (input)="formatarPreco($event)"
                   [class.is-invalid]="formEdicao.controls.preco.touched && formEdicao.controls.preco.invalid">
-
               </div>
 
               <div class="col-12 col-sm-4">
-                <label class="form-label text-secondary small">
+                <label for="quantidadeEdicao" class="form-label text-secondary small">
                   Quantidade
                 </label>
 
@@ -345,7 +346,6 @@
                   class="form-control bg-dark text-light border-secondary rounded-3" [value]="quantidadeExibicao"
                   (input)="formatarQuantidade($event)"
                   [class.is-invalid]="formEdicao.controls.quantidade.touched && formEdicao.controls.quantidade.invalid">
-
               </div>
 
               <div class="col-12 col-sm-4">
@@ -356,6 +356,20 @@
                 <input type="text" formControlName="total"
                   class="form-control bg-dark text-light border-secondary rounded-3" readonly>
               </div>
+
+            </div>
+
+            <div class="mt-2">
+              <div class="form-text text-secondary small">
+                Ex.: 5,00 ou 1.250,50 — use vírgula e até 2 casas decimais.
+              </div>
+
+              @if (formEdicao.controls.preco.invalid &&
+              formEdicao.controls.preco.touched) {
+              <div class="text-danger small mt-1" role="alert">
+                Preço inválido. Use vírgula e até 2 casas decimais.
+              </div>
+              }
             </div>
 
             <div class="mt-4 d-flex justify-content-between align-items-center">
@@ -369,9 +383,11 @@
                 [disabled]="formEdicao.invalid || salvandoEdicao()">
                 {{ salvandoEdicao() ? 'Salvando...' : 'Salvar alterações' }}
               </button>
+
             </div>
 
           </form>
+
         </div>
 
       </div>

@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import 'bootstrap/dist/js/bootstrap.esm.min.js';
+import { Produto } from '../../models/produto.model';
+import { ProdutoService } from '../../services/produto.service';
 
 @Component({
   selector: 'app-produtos',
@@ -18,11 +19,9 @@ import 'bootstrap/dist/js/bootstrap.esm.min.js';
 })
 export class Produtos {
 
-  private apiUrl = "http://localhost:8081/api/v1/produtos";
+  private readonly produtoService = inject(ProdutoService);
 
-  private http = inject(HttpClient);
-
-  produtos = signal<any[]>([]);
+  produtos = signal<Produto[]>([]);
 
   carregando = signal(true);
 
@@ -36,7 +35,7 @@ export class Produtos {
 
   quantidadeExibicao = '';
 
-  produtoParaExcluir = signal<any | null>(null);
+  produtoParaExcluir = signal<Produto | null>(null);
 
   excluindo = signal(false);
   erroExclusao = signal('');
@@ -68,7 +67,7 @@ export class Produtos {
     this.carregando.set(true);
     this.erroCarregamento.set(false);
 
-    this.http.get<any[]>(this.apiUrl).subscribe({
+    this.produtoService.listar().subscribe({
       next: (dados) => {
         this.produtos.set(dados);
         this.carregando.set(false);
@@ -81,7 +80,6 @@ export class Produtos {
       }
     });
   }
-
 
   formatarPreco(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -199,34 +197,34 @@ export class Produtos {
     });
   }
 
-  obterDados(id: number) {
-
+  obterDados(id: number): void {
     this.formEdicao.reset();
     this.precoExibicao = '';
     this.quantidadeExibicao = '';
     this.erroEdicao.set('');
 
-    this.http.get(this.apiUrl + "/" + id)
-      .subscribe((data: any) => {
-        this.precoExibicao = Number(data.preco).toLocaleString('pt-BR', {
+    this.produtoService.buscarPorId(id)
+      .subscribe((data) => {
+        this.precoExibicao = data.preco.toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2
         });
-        this.quantidadeExibicao = Number(data.quantidade).toLocaleString('pt-BR');
+
+        this.quantidadeExibicao = data.quantidade.toLocaleString('pt-BR');
+
         this.formEdicao.patchValue({
-          id: data.id,
+          id: String(data.id),
           nome: data.nome,
           descricao: data.descricao ?? '',
-          preco: data.preco,
-          quantidade: data.quantidade,
-          total: Number(data.total).toLocaleString('pt-BR', {
+          preco: String(data.preco),
+          quantidade: String(data.quantidade),
+          total: data.total.toLocaleString('pt-BR', {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2
           })
         });
-      })
+      });
   }
-
 
   atualizar() {
     this.formEdicao.markAllAsTouched();
@@ -240,14 +238,14 @@ export class Produtos {
     this.notificacao.set('');
 
     const produtoAtualizado = {
-      nome: this.formEdicao.value.nome,
-      descricao: this.formEdicao.value.descricao,
-      preco: Number(this.formEdicao.value.preco),
-      quantidade: Number(this.formEdicao.value.quantidade)
+      nome: this.formEdicao.controls.nome.value ?? '',
+      descricao: this.formEdicao.controls.descricao.value,
+      preco: Number(this.formEdicao.controls.preco.value),
+      quantidade: Number(this.formEdicao.controls.quantidade.value)
     };
 
-    this.http.put<{ nome: string }>(
-      `${this.apiUrl}/${this.formEdicao.value.id}`,
+    this.produtoService.atualizar(
+      Number(this.formEdicao.controls.id.value),
       produtoAtualizado
     ).subscribe({
       next: (produto) => {
@@ -274,7 +272,7 @@ export class Produtos {
     });
   }
 
-  selecionarProdutoParaExcluir(produto: any) {
+  selecionarProdutoParaExcluir(produto: Produto) {
     this.produtoParaExcluir.set(produto);
   }
 
@@ -288,7 +286,7 @@ export class Produtos {
     this.excluindo.set(true);
     this.erroExclusao.set('');
 
-    this.http.delete(`${this.apiUrl}/${produto.id}`).subscribe({
+    this.produtoService.moverParaLixeira(produto.id).subscribe({
       next: () => {
         this.notificacao.set(
           `Produto "${produto.nome}" movido para a lixeira com sucesso!`
@@ -312,19 +310,19 @@ export class Produtos {
     });
   }
 
-  excluir(id: number) {
-    if (confirm('Deseja realmente excluir este produto?')) {
-      this.http.delete(this.apiUrl + "/" + id)
-        .subscribe((data: any) => {
-          this.notificacao.set(`Produto "${data.nome}" excluído com sucesso!`);
-          this.ngOnInit();
-        });
-    }
-  }
-
   private recalcularTotal(): void {
-    const preco = Number(this.formEdicao.controls.preco.value) || 0;
-    const quantidade = Number(this.formEdicao.controls.quantidade.value) || 0;
+    const controlePreco = this.formEdicao.controls.preco;
+    const controleQuantidade = this.formEdicao.controls.quantidade;
+
+    if (controlePreco.invalid || controleQuantidade.invalid) {
+      this.formEdicao.controls.total.setValue('', {
+        emitEvent: false
+      });
+      return;
+    }
+
+    const preco = Number(controlePreco.value);
+    const quantidade = Number(controleQuantidade.value);
 
     const total = preco * quantidade;
 
@@ -337,5 +335,6 @@ export class Produtos {
       emitEvent: false
     });
   }
+
 
 }
