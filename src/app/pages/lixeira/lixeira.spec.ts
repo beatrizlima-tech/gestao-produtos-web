@@ -13,7 +13,7 @@ describe('Lixeira', () => {
     let fixture: ComponentFixture<Lixeira>;
     let httpMock: HttpTestingController;
 
-    const apiUrl = 'http://localhost:8081/api/v1/produtos';
+    const apiUrl = '/api/v1/produtos';
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({

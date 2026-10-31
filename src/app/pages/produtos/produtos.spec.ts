@@ -19,7 +19,7 @@ describe('Produtos', () => {
   let fixture: ComponentFixture<Produtos>;
   let httpMock: HttpTestingController;
 
-  const apiUrl = 'http://localhost:8081/api/v1/produtos';
+  const apiUrl = '/api/v1/produtos';
 
   const produto = {
     id: 52,

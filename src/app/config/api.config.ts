@@ -1,2 +1,1 @@
-export const API_PRODUTOS_URL =
-    'http://localhost:8081/api/v1/produtos';
+export const API_PRODUTOS_URL = '/api/v1/produtos';

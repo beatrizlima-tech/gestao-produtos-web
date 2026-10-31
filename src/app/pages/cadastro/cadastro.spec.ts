@@ -53,7 +53,7 @@ describe('Cadastro', () => {
     component.cadastrar();
 
     const requisicao = httpMock.expectOne(
-      'http://localhost:8081/api/v1/produtos'
+      '/api/v1/produtos'
     );
 
     expect(requisicao.request.method).toBe('POST');

@@ -33,7 +33,7 @@ describe('Dashboard', () => {
     fixture.detectChanges();
 
     const requisicao = httpMock.expectOne(
-      'http://localhost:8081/api/v1/produtos'
+      '/api/v1/produtos'
     );
 
     expect(requisicao.request.method).toBe('GET');
@@ -68,7 +68,7 @@ describe('Dashboard', () => {
     fixture.detectChanges();
 
     const requisicao = httpMock.expectOne(
-      'http://localhost:8081/api/v1/produtos'
+      '/api/v1/produtos'
     );
 
     requisicao.flush('Erro no servidor', {
