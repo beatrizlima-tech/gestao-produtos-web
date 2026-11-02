@@ -1,7 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Cadastro } from './cadastro';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
+import { vi } from 'vitest';
 import { provideHttpClient } from '@angular/common/http';
 
 describe('Cadastro', () => {
@@ -74,4 +75,44 @@ describe('Cadastro', () => {
       'Não foi possível cadastrar'
     );
   });
+
+  it('deve enviar mensagem de sucesso após cadastrar um produto', () => {
+    const router = TestBed.inject(Router);
+
+    const navegar = vi.spyOn(router, 'navigate')
+      .mockResolvedValue(true);
+
+    component.formulario.setValue({
+      nome: 'Produto Teste',
+      descricao: 'Produto para teste automatizado',
+      preco: 25,
+      quantidade: 2
+    });
+
+    component.cadastrar();
+
+    const requisicao = httpMock.expectOne('/api/v1/produtos');
+
+    expect(requisicao.request.method).toBe('POST');
+
+    requisicao.flush({
+      id: 999,
+      nome: 'Produto Teste',
+      descricao: 'Produto para teste automatizado',
+      preco: 25,
+      quantidade: 2,
+      total: 50
+    });
+
+    expect(navegar).toHaveBeenCalledWith(
+      ['/produtos'],
+      {
+        state: {
+          mensagemCadastro:
+            'Produto "Produto Teste" cadastrado com sucesso!'
+        }
+      }
+    );
+  });
+
 });

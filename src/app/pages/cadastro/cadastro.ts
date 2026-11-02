@@ -69,8 +69,13 @@ export class Cadastro {
       preco: dados.preco,
       quantidade: dados.quantidade
     }).subscribe({
+
       next: () => {
-        this.router.navigate(['/produtos']);
+        this.router.navigate(['/produtos'], {
+          state: {
+            mensagemCadastro: `Produto "${dados.nome}" cadastrado com sucesso!`
+          }
+        });
       },
 
       error: () => {

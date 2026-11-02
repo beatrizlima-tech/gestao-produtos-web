@@ -62,6 +62,17 @@ export class Produtos {
   });
 
   ngOnInit(): void {
+    const mensagem = history.state?.mensagemCadastro;
+
+    if (typeof mensagem === 'string') {
+      this.notificacao.set(mensagem);
+
+      history.replaceState(
+        { ...history.state, mensagemCadastro: null },
+        ''
+      );
+    }
+
     this.carregarProdutos();
   }
 
