@@ -1,20 +1,17 @@
 <div class="container-fluid bg-dark text-light min-vh-100 py-4">
   <div class="container-fluid px-3 px-lg-4">
 
-    @if(notificacao()) {
+    @if (notificacao()) {
     <div class="produtos-notificacao" role="status">
       <span>{{ notificacao() }}</span>
 
       <button type="button" aria-label="Fechar notificação" (click)="notificacao.set('')">
         ×
       </button>
-
     </div>
     }
 
-
     <header class="produtos-header">
-
       <div class="produtos-header-content">
         <span class="produtos-eyebrow">
           GERENCIAMENTO DE ESTOQUE
@@ -35,25 +32,27 @@
           <path d="M12 12v9"></path>
         </svg>
       </div>
-
     </header>
 
-
     <div class="card produtos-card text-light rounded-4">
+
       <div
         class="card-header bg-transparent border-secondary d-flex justify-content-between align-items-center flex-wrap gap-3 p-4">
         <div>
           <h5 class="fw-semibold mb-1">Consulta de produtos</h5>
-          <p class="text-secondary mb-0 small">Visualize, edite e exclua os produtos cadastrados.</p>
+          <p class="text-secondary mb-0 small">
+            Visualize, edite e exclua os produtos cadastrados.
+          </p>
         </div>
+
         <a routerLink="/produtos/novo" class="btn btn-primary rounded-3">
           + Cadastrar produto
         </a>
-
       </div>
-      <div class="card-body p-4">
-        <div class="produtos-toolbar">
 
+      <div class="card-body p-4">
+
+        <div class="produtos-toolbar">
           <div class="produtos-search">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="10.5" cy="10.5" r="6.5"></circle>
@@ -62,15 +61,40 @@
 
             <input #campoBusca type="search" placeholder="Pesquisar produto pelo nome..."
               aria-label="Pesquisar produto pelo nome" [value]="busca()" (input)="busca.set(campoBusca.value)" />
+          </div>
+        </div>
 
+        <div class="table-responsive">
+
+          @if (carregando()) {
+
+          <div class="produtos-empty" role="status">
+            <div class="spinner-border text-primary mb-3" aria-hidden="true"></div>
+
+            <h3>Carregando produtos...</h3>
+
+            <p>
+              Aguarde enquanto consultamos os produtos cadastrados.
+            </p>
+          </div>
+          } @else if (erroCarregamento()) {
+
+          <div class="produtos-empty" role="alert">
+            <h3>Não foi possível carregar os produtos</h3>
+
+            <p>
+              Ocorreu um problema ao consultar a API.
+              Verifique a conexão e tente novamente.
+            </p>
+
+            <button type="button" class="btn btn-primary rounded-3" (click)="carregarProdutos()">
+              Tentar novamente
+            </button>
           </div>
 
-        </div>
-        <div class="table-responsive">
-          @if (produtos().length === 0) {
+          } @else if (produtos().length === 0) {
 
           <div class="produtos-empty">
-
             <div class="produtos-empty-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M3 7.5 12 3l9 4.5-9 4.5L3 7.5Z"></path>
@@ -85,13 +109,11 @@
               Os produtos cadastrados aparecerão aqui.
               Comece adicionando seu primeiro produto.
             </p>
-
           </div>
 
           } @else if (produtosFiltrados().length === 0) {
 
           <div class="produtos-empty">
-
             <div class="produtos-empty-icon">
               <svg viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="10.5" cy="10.5" r="6.5"></circle>
@@ -105,13 +127,83 @@
               Não encontramos produtos com esse nome.
               Tente pesquisar novamente.
             </p>
-
           </div>
 
           } @else {
 
-          <div class="table-responsive">
+          <div class="d-lg-none d-grid gap-3">
 
+            @for (item of produtosFiltrados(); track item.id) {
+
+            <div class="card bg-dark text-light border-secondary rounded-4">
+              <div class="card-body p-3">
+
+                <div class="d-flex justify-content-between gap-2 mb-3">
+                  <div class="flex-grow-1" style="min-width: 0;">
+                    <div class="fw-semibold text-break">
+                      {{ item.nome }}
+                    </div>
+
+                    @if (item.descricao) {
+                    <p class="small text-secondary mt-1 mb-0 text-break">
+                      {{ item.descricao }}
+                    </p>
+                    }
+                  </div>
+
+                  <span class="text-secondary small">
+                    #{{ item.id }}
+                  </span>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-6">
+                    <div class="small text-secondary">Preço unitário</div>
+                    <div class="fw-semibold text-break">
+                      {{ item.preco | currency:'BRL':'symbol':'1.2-2' }}
+                    </div>
+                  </div>
+
+                  <div class="col-6">
+                    <div class="small text-secondary">Quantidade</div>
+                    <div class="fw-semibold">
+                      {{ item.quantidade | number:'1.0-0' }}
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-top border-secondary pt-3 mb-3">
+                  <div class="small text-secondary">Valor total</div>
+                  <div class="fs-5 fw-bold text-break">
+                    {{ item.total | currency:'BRL':'symbol':'1.2-2' }}
+                  </div>
+                </div>
+
+                <div class="row g-2">
+                  <div class="col-6">
+                    <button type="button" class="btn btn-outline-warning w-100 rounded-3" data-bs-toggle="modal"
+                      data-bs-target="#modalEdicao" (click)="obterDados(item.id)">
+                      Editar
+                    </button>
+                  </div>
+
+                  <div class="col-6">
+                    <button type="button" class="btn btn-outline-danger w-100 rounded-3" data-bs-toggle="modal"
+                      data-bs-target="#modalExclusao"
+                      (click)="selecionarProdutoParaExcluir(item); confirmacaoExclusao.set(false); erroExclusao.set('')">
+                      Excluir
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+            }
+
+          </div>
+
+          <div class="table-responsive d-none d-lg-block">
             <table class="table table-dark table-hover align-middle mb-0 produtos-table">
 
               <thead>
@@ -126,99 +218,299 @@
               </thead>
 
               <tbody>
-
                 @for (item of produtosFiltrados(); track item.id) {
-
                 <tr>
                   <td>{{ item.id }}</td>
-                  <td>{{ item.nome | uppercase }}</td>
-                  <td>{{ item.preco | currency : 'BRL':'symbol':'1.2-2' }}</td>
-                  <td>{{ item.quantidade }}</td>
-                  <td>{{ item.total | currency : 'BRL':'symbol':'1.2-2' }}</td>
+
+                  <td>
+                    <div class="fw-semibold">
+                      {{ item.nome | uppercase }}
+                    </div>
+
+                    @if (item.descricao) {
+                    <div class="small text-secondary mt-1 text-break">
+                      {{ item.descricao }}
+                    </div>
+                    }
+                  </td>
+
+                  <td>{{ item.preco | currency:'BRL':'symbol':'1.2-2' }}</td>
+                  <td>{{ item.quantidade | number:'1.0-0':'pt-BR' }}</td>
+                  <td>{{ item.total | currency:'BRL':'symbol':'1.2-2' }}</td>
 
                   <td class="text-center">
-
-                    <button class="btn btn-outline-warning btn-sm rounded-3 me-1" data-bs-toggle="modal"
+                    <button type="button" class="btn btn-outline-warning btn-sm rounded-3 me-1" data-bs-toggle="modal"
                       data-bs-target="#modalEdicao" (click)="obterDados(item.id)">
                       Editar
                     </button>
 
-                    <button class="btn btn-outline-danger btn-sm rounded-3" (click)="excluir(item.id)">
+                    <button type="button" class="btn btn-outline-danger btn-sm rounded-3" data-bs-toggle="modal"
+                      data-bs-target="#modalExclusao"
+                      (click)="selecionarProdutoParaExcluir(item); confirmacaoExclusao.set(false); erroExclusao.set('')">
                       Excluir
                     </button>
-
                   </td>
                 </tr>
-
                 }
-
               </tbody>
 
             </table>
-
           </div>
 
           }
+
         </div>
       </div>
-
     </div>
   </div>
 
-  <div class="modal fade" id="modalEdicao" tabindex="-1">
+  <div class="modal fade" id="modalEdicao" tabindex="-1" aria-labelledby="tituloModalEdicao" aria-hidden="true">
+
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content bg-black text-light border-secondary">
+
         <div class="modal-header border-secondary">
           <div>
-            <h5 class="modal-title fw-semibold">Editar produto</h5>
-            <p class="text-secondary small mb-0">Altere os dados do produto selecionado.</p>
+            <h5 class="modal-title fw-semibold" id="tituloModalEdicao">
+              Editar produto
+            </h5>
+
+            <p class="text-secondary small mb-0">
+              Altere os dados do produto selecionado.
+            </p>
           </div>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar">
+          </button>
         </div>
+
         <div class="modal-body">
+
+          @if (carregandoEdicao()) {
+            <div class="alert alert-info mb-3" role="status">
+              Carregando dados do produto...
+            </div>
+          }
+
+          @if (erroEdicao()) {
+          <div class="alert alert-danger mb-3" role="alert">
+            {{ erroEdicao() }}
+          </div>
+          }
+
 
           <form [formGroup]="formEdicao" (ngSubmit)="atualizar()">
 
             <div class="row g-3 mb-3">
               <div class="col-3">
-                <label class="form-label text-secondary small">ID</label>
+                <label class="form-label text-secondary small">
+                  ID
+                </label>
+
                 <input type="text" formControlName="id"
                   class="form-control bg-dark text-light border-secondary rounded-3" readonly>
               </div>
+
               <div class="col-9">
-                <label class="form-label text-secondary small">Nome do produto</label>
+                <label class="form-label text-secondary small">
+                  Nome do produto
+                </label>
+
                 <input type="text" formControlName="nome"
                   class="form-control bg-dark text-light border-secondary rounded-3">
               </div>
             </div>
+
+            <div class="mb-3">
+              <label for="descricaoEdicao" class="form-label text-secondary small">
+                Descrição do produto
+              </label>
+
+              <textarea id="descricaoEdicao" formControlName="descricao"
+                class="form-control bg-dark text-light border-secondary rounded-3" maxlength="500" rows="2"></textarea>
+            </div>
+
             <div class="row g-3">
-              <div class="col-4">
-                <label class="form-label text-secondary small">Preço (R$)</label>
-                <input type="number" formControlName="preco"
-                  class="form-control bg-dark text-light border-secondary rounded-3" step="0.01">
+
+              <div class="col-12 col-sm-4">
+                <label for="precoEdicao" class="form-label text-secondary small">
+                  Preço (R$)
+                </label>
+
+                <input type="text" inputmode="decimal" id="precoEdicao"
+                  class="form-control bg-dark text-light border-secondary rounded-3" [value]="precoExibicao"
+                  (input)="formatarPreco($event)"
+                  [class.is-invalid]="formEdicao.controls.preco.touched && formEdicao.controls.preco.invalid">
               </div>
-              <div class="col-4">
-                <label class="form-label text-secondary small">Quantidade</label>
-                <input type="number" formControlName="quantidade"
-                  class="form-control bg-dark text-light border-secondary rounded-3">
+
+              <div class="col-12 col-sm-4">
+                <label for="quantidadeEdicao" class="form-label text-secondary small">
+                  Quantidade
+                </label>
+
+                <input type="text" inputmode="numeric" id="quantidadeEdicao"
+                  class="form-control bg-dark text-light border-secondary rounded-3" [value]="quantidadeExibicao"
+                  (input)="formatarQuantidade($event)"
+                  [class.is-invalid]="formEdicao.controls.quantidade.touched && formEdicao.controls.quantidade.invalid">
               </div>
-              <div class="col-4">
-                <label class="form-label text-secondary small">Total</label>
+
+              <div class="col-12 col-sm-4">
+                <label class="form-label text-secondary small">
+                  Total
+                </label>
+
                 <input type="text" formControlName="total"
                   class="form-control bg-dark text-light border-secondary rounded-3" readonly>
               </div>
+
             </div>
 
-            <div class="mt-4">
-              <button type="submit" class="btn btn-warning rounded-3" data-bs-dismiss="modal"
-                [disabled]="formEdicao.invalid">
-                Salvar alterações
+            <div class="mt-2">
+              <div class="form-text text-secondary small">
+                Ex.: 5,00 ou 1.250,50 — use vírgula e até 2 casas decimais.
+              </div>
+
+              @if (formEdicao.controls.preco.invalid &&
+              formEdicao.controls.preco.touched) {
+              <div class="text-danger small mt-1" role="alert">
+                Preço inválido. Use vírgula e até 2 casas decimais.
+              </div>
+              }
+            </div>
+
+            <div class="mt-4 d-flex justify-content-between align-items-center">
+
+              <button type="button" class="btn btn-outline-light rounded-3" data-bs-dismiss="modal"
+                [disabled]="salvandoEdicao()" (click)="limparEdicao()">
+                Cancelar
               </button>
+
+              <button type="submit" class="btn btn-warning rounded-3"
+                [disabled]="formEdicao.invalid || salvandoEdicao() || carregandoEdicao()">
+                {{ salvandoEdicao() ? 'Salvando...' : 'Salvar alterações' }}
+              </button>
+
             </div>
 
           </form>
 
         </div>
+
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="modalExclusao" tabindex="-1" aria-labelledby="tituloModalExclusao" aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-light border-secondary rounded-4">
+
+        <div class="modal-header border-secondary p-4">
+          <div>
+            <h5 class="modal-title fw-semibold" id="tituloModalExclusao">
+
+              @if (confirmacaoExclusao()) {
+              Confirmar exclusão
+              } @else {
+              Mover produto para a lixeira?
+              }
+
+            </h5>
+
+            <p class="text-secondary small mb-0 mt-2">
+              @if (confirmacaoExclusao()) {
+              Esta ação precisa da sua confirmação.
+              } @else {
+              Confira o produto antes de continuar.
+              }
+            </p>
+          </div>
+
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"
+            (click)="confirmacaoExclusao.set(false)">
+          </button>
+        </div>
+
+        <div class="modal-body p-4">
+
+          @if (produtoParaExcluir(); as produto) {
+          <div class="rounded-3 p-3 mb-4" style="background: #202936; border: 1px solid #384355;">
+
+            <div class="fw-semibold text-light">
+              {{ produto.nome }}
+            </div>
+
+            @if (produto.descricao) {
+            <p class="text-secondary small mt-2 mb-0">
+              {{ produto.descricao }}
+            </p>
+            }
+          </div>
+          }
+
+          @if (!confirmacaoExclusao()) {
+
+          <div class="rounded-3 p-3"
+            style="background: rgba(96, 165, 250, 0.08); border: 1px solid rgba(96, 165, 250, 0.2);">
+
+            <strong style="color: #93c5fd;">
+              Você poderá recuperar este produto.
+            </strong>
+
+            <p class="text-light small mt-2 mb-0">
+              O produto ficará disponível na lixeira por até
+              30 dias. Durante esse período, poderá ser
+              restaurado ou excluído definitivamente.
+            </p>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-4">
+            <button type="button" class="btn btn-outline-light rounded-3 px-4" data-bs-dismiss="modal"
+              (click)="confirmacaoExclusao.set(false)">
+              Cancelar
+            </button>
+
+            <button type="button" class="btn btn-primary rounded-3 px-4" (click)="confirmacaoExclusao.set(true)">
+              Continuar
+            </button>
+          </div>
+
+          } @else {
+
+          <div class="mb-4">
+            <h6 class="fw-semibold text-light mb-2">
+              Tem certeza de que deseja mover este produto para a lixeira?
+            </h6>
+
+            <p class="text-secondary small mb-0">
+              O produto deixará de aparecer na lista de produtos ativos.
+              Você poderá recuperá-lo na lixeira por até 30 dias.
+            </p>
+          </div>
+
+          @if (erroExclusao()) {
+          <div class="alert alert-danger mb-3" role="alert">
+            {{ erroExclusao() }}
+          </div>
+          }
+
+          <div class="d-flex justify-content-end gap-2 flex-wrap mt-4">
+            <button type="button" class="btn btn-outline-light rounded-3 px-4" [disabled]="excluindo()"
+              (click)="confirmacaoExclusao.set(false)">
+              Não, voltar
+            </button>
+
+            <button type="button" class="btn btn-danger rounded-3 px-4" [disabled]="excluindo()"
+              (click)="confirmarExclusao()">
+              {{ excluindo() ? 'Movendo...' : 'Sim, confirmar' }}
+            </button>
+          </div>
+
+          }
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

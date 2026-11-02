@@ -1,15 +1,8 @@
 
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { ProdutoService } from '../../services/produto.service';
 import { RouterLink } from '@angular/router';
-
-interface Produto {
-  id: number;
-  nome: string;
-  preco: number;
-  quantidade: number;
-  total: number;
-}
+import { Produto } from '../../models/produto.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,10 +12,7 @@ interface Produto {
 })
 export class Dashboard implements OnInit {
 
-  private readonly http = inject(HttpClient);
-
-  private readonly apiUrl =
-    'http://localhost:8081/api/v1/produtos';
+  private readonly produtoService = inject(ProdutoService);
 
   readonly produtos = signal<Produto[]>([]);
   readonly carregando = signal(true);
@@ -54,15 +44,17 @@ export class Dashboard implements OnInit {
   );
 
   ngOnInit(): void {
-    this.http.get<Produto[]>(this.apiUrl).subscribe({
+    this.produtoService.listar().subscribe({
       next: (dados) => {
         this.produtos.set(dados);
         this.carregando.set(false);
       },
+
       error: () => {
         this.erro.set(true);
         this.carregando.set(false);
       }
     });
   }
+
 }

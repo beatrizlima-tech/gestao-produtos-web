@@ -1,25 +1,29 @@
 
 import { Routes } from '@angular/router';
 
-import { Dashboard } from './pages/dashboard/dashboard';
-import { Produtos } from './pages/produtos/produtos';
-import { Cadastro } from './pages/cadastro/cadastro';
-
 export const routes: Routes = [
-    {
-        path: '',
-        component: Dashboard
-    },
-    {
-        path: 'produtos',
-        component: Produtos
-    },
-    {
-        path: 'produtos/novo',
-        component: Cadastro
-    },
-    {
-        path: '**',
-        redirectTo: ''
-    }
+  {
+    path: '',
+    loadComponent: () =>
+      import('./pages/dashboard/dashboard').then(m => m.Dashboard)
+  },
+  {
+    path: 'produtos',
+    loadComponent: () =>
+      import('./pages/produtos/produtos').then(m => m.Produtos)
+  },
+  {
+    path: 'produtos/novo',
+    loadComponent: () =>
+      import('./pages/cadastro/cadastro').then(m => m.Cadastro)
+  },
+  {
+    path: 'lixeira',
+    loadComponent: () =>
+      import('./pages/lixeira/lixeira').then(m => m.Lixeira)
+  },
+  {
+    path: '**',
+    redirectTo: ''
+  }
 ];
