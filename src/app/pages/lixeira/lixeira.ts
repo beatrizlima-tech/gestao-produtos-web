@@ -74,6 +74,12 @@ export class Lixeira {
     );
   }
 
+  restauracaoBloqueada(produto: ProdutoLixeira): boolean {
+    const dias = this.diasRestantes(produto.dataExclusao);
+
+    return this.restaurandoId() !== null || dias === 0 || dias === null;
+  }
+
   restaurarProduto(produto: ProdutoLixeira) {
     if (this.restaurandoId() !== null) {
       return;
