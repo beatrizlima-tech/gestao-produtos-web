@@ -232,4 +232,76 @@ describe('Lixeira', () => {
         }
     });
 
+    it('deve desabilitar a restauração quando o prazo expirar', () => {
+
+        //ARRANGE
+        const produto = {
+            id: 10,
+            nome: 'Notebook',
+            descricao: 'Produto de teste',
+            preco: 2500,
+            quantidade: 1,
+            total: 2500,
+            dataExclusao: new Date(
+                Date.now() - 31 * 24 * 60 * 60 * 1000
+            ).toISOString()
+        };
+
+        //ACT
+        fixture.detectChanges();
+
+        const requisicao = httpMock.expectOne(
+            `${apiUrl}/lixeira`
+        );
+
+        expect(requisicao.request.method).toBe('GET');
+
+        requisicao.flush([produto]);
+
+        fixture.detectChanges();
+
+        //ASSERT
+        const botao = fixture.nativeElement.querySelector(
+            '.lixeira-btn-restaurar'
+        ) as HTMLButtonElement || null;
+
+        expect(botao).not.toBeNull();
+        expect(botao?.disabled).toBe(true);
+    });
+
+    it('deve desabilitar a restauração quando a data estiver ausente', () => {
+
+        //ARRANGE
+        const produto = {
+            id: 11,
+            nome: 'Monitor',
+            descricao: 'Produto de teste',
+            preco: 900,
+            quantidade: 1,
+            total: 900,
+            dataExclusao: null
+        };
+
+        //ACT
+        fixture.detectChanges();
+
+        const requisicao = httpMock.expectOne(
+            `${apiUrl}/lixeira`
+        );
+
+        expect(requisicao.request.method).toBe('GET');
+
+        requisicao.flush([produto]);
+
+        fixture.detectChanges();
+
+        //ASSERT
+        const botao = fixture.nativeElement.querySelector(
+            '.lixeira-btn-restaurar'
+        ) as HTMLButtonElement | null;
+
+        expect(botao).not.toBeNull();
+        expect(botao?.disabled).toBe(true);
+    });
+
 });

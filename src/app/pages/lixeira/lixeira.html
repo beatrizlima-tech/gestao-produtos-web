@@ -144,7 +144,7 @@
 
                             <button type="button"
                                 class="btn lixeira-btn-restaurar d-inline-flex align-items-center gap-2"
-                                [disabled]="restaurandoId() !== null" data-bs-toggle="modal"
+                                [disabled]="restaurandoId() !== null || diasRestantes(produto.dataExclusao) === 0 || diasRestantes(produto.dataExclusao) === null" data-bs-toggle="modal"
                                 data-bs-target="#modalRestauracao" (click)="selecionarProdutoParaRestaurar(produto)">
 
                                 <svg lucideRotateCcw [size]="18" aria-hidden="true"></svg>
@@ -249,7 +249,7 @@
                             Não, voltar
                         </button>
                         <button type="button" class="btn btn-primary rounded-3 px-4"
-                            [disabled]="restaurandoId() !== null" (click)="restaurarProduto(produto)">
+                            [disabled]="restaurandoId() !== null || diasRestantes(produto.dataExclusao) === 0 || diasRestantes(produto.dataExclusao) === null" (click)="restaurarProduto(produto)">
 
                             {{ restaurandoId() === produto.id ? 'Restaurando...' : 'Sim, restaurar' }}
 
