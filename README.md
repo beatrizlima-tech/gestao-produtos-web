@@ -93,13 +93,26 @@ Funcionalidades implementadas:
 - Estados de carregamento, erro e ausência de produtos
 - Interface em tema escuro com ícones Lucide
 
+
 **Status atual:**
 
-A listagem da Lixeira e o cálculo do prazo de recuperação estão implementados.
+A Lixeira está funcional e integrada à API REST desenvolvida em Java e Spring Boot.
 
-Os botões **Restaurar** e **Excluir definitivamente** já estão presentes na interface, mas permanecem desabilitados enquanto suas funcionalidades são desenvolvidas.
+As seguintes operações estão implementadas:
 
-A exibição da data de exclusão e a atualização automática do prazo enquanto a página permanece aberta também estão previstas para as próximas etapas.
+- Exclusão lógica de produtos, mantendo os registros disponíveis para recuperação.
+- Restauração de produtos dentro do prazo de 30 dias.
+- Exclusão definitiva de produtos, com confirmação em duas etapas.
+- Bloqueio da restauração quando o prazo de recuperação está encerrado.
+- Atualização da listagem após as operações.
+- Exibição de notificações de sucesso e mensagens de erro.
+
+As funcionalidades de exclusão lógica, restauração e exclusão definitiva foram validadas manualmente com o frontend, a API e o PostgreSQL.
+
+**Melhorias previstas:**
+
+- Exibir a data de exclusão de cada produto.
+- Atualizar automaticamente o prazo restante enquanto a página permanece aberta.
 
 ## 🏗️ Arquitetura
 
@@ -156,13 +169,24 @@ http://localhost:8081
 | PATCH | `/api/v1/produtos/{id}/restaurar` | Restaurar produto |
 | DELETE | `/api/v1/produtos/{id}/definitivo` | Excluir produto definitivamente |
 
-**Observação:** os endpoints de restauração e exclusão definitiva estão disponíveis no backend, mas sua integração com os botões da interface Angular ainda está em desenvolvimento.
+
+**Integração com o backend:**
+
+As operações de restauração e exclusão definitiva estão integradas à API REST e podem ser executadas diretamente pela interface Angular.
+
+- **Restauração:** utiliza o endpoint `PATCH /api/v1/produtos/{id}/restaurar`, respeitando o prazo de recuperação de 30 dias definido pelo backend.
+- **Exclusão definitiva:** utiliza o endpoint `DELETE /api/v1/produtos/{id}/definitivo`, removendo permanentemente o registro.
+- **Segurança das operações:** ambas possuem confirmação na interface, tratamento de erros e notificações de sucesso.
+
+As operações foram verificadas em testes manuais com o Angular, Spring Boot e PostgreSQL.
+
 
 A documentação interativa da API pode ser acessada pelo Swagger:
 
 ```text
 http://localhost:8081/swagger-ui/index.html
 ```
+
 
 ## ⚙️ Como executar o projeto
 
@@ -186,33 +210,25 @@ git clone https://github.com/beatrizlima-tech/gestao-produtos-web.git
 cd gestao-produtos-web
 ```
 
-### 3. Selecione a branch de desenvolvimento
-
-```bash
-git switch feat/descricao-produtos
-```
-
-> As funcionalidades mais recentes da Lixeira estão nesta branch e ainda não foram integradas à `main`.
-
-### 4. Instale as dependências
+### 3. Instale as dependências
 
 ```bash
 npm install
 ```
 
-### 5. Inicie o backend
+### 4. Inicie o backend
 
 Antes de executar o Angular, inicie a API Spring Boot, seguindo as instruções disponíveis no repositório do backend.
 
 A API deve estar acessível na porta `8081`.
 
-### 6. Execute o frontend
+### 5. Execute o frontend
 
 ```bash
 npm start
 ```
 
-### 7. Acesse no navegador
+### 6. Acesse no navegador
 
 ```text
 http://localhost:4200
@@ -254,15 +270,13 @@ Os arquivos gerados serão disponibilizados na pasta `dist/`.
 - Interface responsiva e experiência do usuário
 - Versionamento de código com Git e GitHub
 
+
 ## 🚧 Funcionalidades em desenvolvimento
 
-- Restaurar produtos diretamente pela Lixeira
-- Excluir produtos definitivamente com confirmação explícita
-- Exibir a data real de exclusão
-- Atualizar automaticamente o prazo restante de recuperação
-- Adicionar acesso à Lixeira no menu de navegação
-- Refinar validações e feedbacks das operações de edição
-- Ampliar os testes das funcionalidades
+- Exibir a data real de exclusão de cada produto na Lixeira.
+- Atualizar automaticamente o prazo restante de recuperação enquanto a página permanece aberta.
+- Refinar as validações e os feedbacks das operações de edição.
+- Ampliar a cobertura de testes automatizados.
 
 ## 🔮 Possíveis melhorias futuras
 
