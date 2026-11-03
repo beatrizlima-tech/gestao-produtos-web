@@ -210,26 +210,21 @@ describe('Lixeira', () => {
     it('deve calcular corretamente os dias restantes na lixeira', () => {
         const agora = new Date('2026-10-30T12:00:00Z');
 
-        const relogio = vi.spyOn(Date, 'now')
-            .mockReturnValue(agora.getTime());
+        component.agora.set(agora.getTime());
 
-        try {
-            expect (
-                component.diasRestantes('2026-10-20T12:00:00Z')
-            ).toBe(20);
+        expect(
+            component.diasRestantes('2026-10-20T12:00:00Z')
+        ).toBe(20);
 
-            expect(
-                component.diasRestantes('2026-09-01T12:00:00Z')
-            ).toBe(0);
+        expect(
+            component.diasRestantes('2026-09-01T12:00:00Z')
+        ).toBe(0);
 
-            expect(component.diasRestantes(null)).toBeNull();
+        expect(component.diasRestantes(null)).toBeNull();
 
-            expect (
-                component.diasRestantes('data-invalida')
-            ).toBeNull();
-        } finally {
-            relogio.mockRestore();
-        }
+        expect(
+            component.diasRestantes('data-invalida')
+        ).toBeNull();
     });
 
     it('deve desabilitar a restauração quando o prazo expirar', () => {
@@ -329,6 +324,77 @@ describe('Lixeira', () => {
         expect(texto).toContain('Excluído em:');
         expect(texto).toContain('29/10/2026');
         expect(texto).toContain('10:00');
+    });
+
+    it('deve atualizar o relógio a cada minuto e parar ao sair da lixeira', () => {
+        vi.useFakeTimers();
+
+        const inicio = new Date('2026-10-30T12:00:00Z').getTime();
+        vi.setSystemTime(inicio);
+
+        try {
+            fixture.detectChanges();
+
+            const requisicao = httpMock.expectOne(
+                `${apiUrl}/lixeira`
+            );
+
+            requisicao.flush([]);
+
+            vi.advanceTimersByTime(60_000);
+
+            expect(component.agora()).toBe(inicio + 60_000);
+
+            fixture.destroy();
+
+            vi.advanceTimersByTime(60_000);
+
+            expect(component.agora()).toBe(inicio + 60_000);
+        } finally {
+            vi.useRealTimers();
+        }
+    });
+
+    it('deve atualizar o prazo exibido quando a recuperação expirar', () => {
+        vi.useFakeTimers();
+
+        const inicio = new Date('2026-10-31T11:59:30Z').getTime();
+        vi.setSystemTime(inicio);
+        component.agora.set(inicio);
+
+        const produto = {
+            id: 52,
+            nome: 'Notebook Lenovo',
+            descricao: 'Produto de teste',
+            preco: 2500,
+            quantidade: 1,
+            total: 2500,
+            dataExclusao: '2026-10-01T12:00:00Z'
+        };
+
+        try {
+            fixture.detectChanges();
+
+            const requisicao = httpMock.expectOne(
+                `${apiUrl}/lixeira`
+            );
+
+            requisicao.flush([produto]);
+            fixture.detectChanges();
+
+            expect(component.diasRestantes(produto.dataExclusao)).toBe(1);
+
+            vi.advanceTimersByTime(60_000);
+            fixture.detectChanges();
+
+            expect(component.diasRestantes(produto.dataExclusao)).toBe(0);
+
+            expect(fixture.nativeElement.textContent)
+                .toContain('Prazo de recuperação encerrado');
+        } finally {
+            fixture.destroy();
+            vi.useRealTimers();
+        }
     });
 
 });

@@ -1,5 +1,4 @@
-
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { LucideClock3, LucideHash, LucideInfo, LucidePackage, LucideRotateCcw, LucideTrash, LucideWallet } from '@lucide/angular';
 import 'bootstrap/dist/js/bootstrap.esm.min.js';
 import { ProdutoLixeira } from '../../models/produto.model';
@@ -24,8 +23,10 @@ import { DatePipe } from '@angular/common';
 export class Lixeira {
 
   private readonly produtoService = inject(ProdutoService);
+  private readonly destroyRef = inject(DestroyRef);
 
   produtosExcluidos = signal<ProdutoLixeira[]>([]);
+  agora = signal(Date.now());
   carregando = signal(true);
   erro = signal('');
   restaurandoId = signal<number | null>(null);
@@ -69,7 +70,7 @@ export class Lixeira {
       data.getTime() + prazoEmDias * milissegundosPorDia;
 
     const diferenca =
-      dataLimite - Date.now();
+      dataLimite - this.agora();
 
     return Math.max(
       0,
@@ -156,6 +157,15 @@ export class Lixeira {
   }
 
   ngOnInit(): void {
+
+    const intervalo = setInterval(() => {
+      this.agora.set(Date.now());
+    }, 60_000);
+
+    this.destroyRef.onDestroy(() => {
+      clearInterval(intervalo);
+    });
+
     this.produtoService.listarLixeira().subscribe({
       next: (produtos) => {
         this.produtosExcluidos.set(produtos);
