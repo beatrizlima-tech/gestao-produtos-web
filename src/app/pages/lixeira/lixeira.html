@@ -123,6 +123,15 @@
 
                         <hr class="lixeira-divisor">
 
+                        @if (produto.dataExclusao) {
+                            <p class="text-secondary small mb-2">
+                                Excluído em:
+                                {{ produto.dataExclusao | date: 'dd/MM/yyyy' }}
+                                às
+                                {{ produto.dataExclusao | date: 'HH:mm' }}
+                            </p>
+                        }
+
                         <div class="lixeira-prazo">
                             <svg lucideClock3 [size]="18" aria-hidden="true"></svg>
 

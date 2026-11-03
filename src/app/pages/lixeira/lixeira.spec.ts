@@ -304,4 +304,31 @@ describe('Lixeira', () => {
         expect(botao?.disabled).toBe(true);
     });
 
+    it('deve exibir a data de exclusão formatada', () => {
+        const produto = {
+            id: 52,
+            nome: 'Notebook Lenovo',
+            descricao: 'Produto de teste',
+            preco: 2500,
+            quantidade: 1,
+            total: 2500,
+            dataExclusao: '2026-10-29T10:00:00'
+        }
+
+        fixture.detectChanges();
+
+        const requisicao = httpMock.expectOne(
+            `${apiUrl}/lixeira`
+        );
+
+        requisicao.flush([produto]);
+        fixture.detectChanges();
+
+        const texto = fixture.nativeElement.textContent;
+
+        expect(texto).toContain('Excluído em:');
+        expect(texto).toContain('29/10/2026');
+        expect(texto).toContain('10:00');
+    });
+
 });
