@@ -4,10 +4,13 @@ import { LucideClock3, LucideHash, LucideInfo, LucidePackage, LucideRotateCcw, L
 import 'bootstrap/dist/js/bootstrap.esm.min.js';
 import { ProdutoLixeira } from '../../models/produto.model';
 import { ProdutoService } from '../../services/produto.service';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-lixeira',
-  imports: [LucideRotateCcw,
+  imports: [
+    DatePipe,
+    LucideRotateCcw,
     LucideTrash,
     LucideClock3,
     LucideHash,
